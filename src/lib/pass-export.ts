@@ -115,7 +115,7 @@ export async function composePassPng(
       EXPORT_HEIGHT,
     );
   } else {
-    context.fillStyle = "#130b09";
+    context.fillStyle = "#0d0d0d";
     context.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
   }
 
