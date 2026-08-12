@@ -8,7 +8,7 @@
   width: 1600px;
   height: 900px;
   overflow: hidden;
-  background: #130b09;
+  background: #0d0d0d;
 }
 
 .waves {
@@ -25,8 +25,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 42%, rgb(112 37 31 / 18%), transparent 46%),
-    linear-gradient(180deg, rgb(18 10 8 / 16%), rgb(12 7 6 / 76%));
+    radial-gradient(circle at 50% 42%, rgb(255 255 255 / 5.5%), transparent 46%),
+    linear-gradient(180deg, rgb(0 0 0 / 8%), rgb(0 0 0 / 68%));
   opacity: 0.35;
   pointer-events: none;
 }

@@ -48,7 +48,7 @@ export default function IntroPage() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <main className="relative min-h-[100dvh] overflow-hidden bg-[#130b09]">
+      <main className="relative min-h-[100dvh] overflow-hidden bg-[#0d0d0d]">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -60,7 +60,7 @@ export default function IntroPage() {
 
         <motion.div
           aria-hidden="true"
-          className="pointer-events-none fixed inset-0 z-[1] bg-[radial-gradient(circle_at_50%_42%,rgba(112,37,31,0.18),transparent_46%),linear-gradient(180deg,rgba(18,10,8,0.16),rgba(12,7,6,0.76))]"
+          className="pointer-events-none fixed inset-0 z-[1] bg-[radial-gradient(circle_at_50%_42%,rgba(255,255,255,0.055),transparent_46%),linear-gradient(180deg,rgba(0,0,0,0.08),rgba(0,0,0,0.68))]"
           animate={{ opacity: submittedHandle ? 0.35 : 0.1 }}
           transition={{ duration: 0.6, ease: enterEase }}
         />

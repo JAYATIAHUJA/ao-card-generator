@@ -41,17 +41,6 @@ function PassStub() {
   );
 }
 
-function PassNotches() {
-  return (
-    <>
-      <span className={`${styles.notch} ${styles.notchLeft}`} aria-hidden="true" />
-      <span className={`${styles.notch} ${styles.notchRight}`} aria-hidden="true" />
-      <span className={`${styles.notchSmall} ${styles.notchTop}`} aria-hidden="true" />
-      <span className={`${styles.notchSmall} ${styles.notchBottom}`} aria-hidden="true" />
-    </>
-  );
-}
-
 interface PassFrontFaceProps {
   visible: boolean;
   shader: ShaderLayerProps;
@@ -132,7 +121,6 @@ export function PassFrontFace({
         </div>
       </div>
       <PassStub />
-      <PassNotches />
     </section>
   );
 }
@@ -179,7 +167,6 @@ export function PassBackFace({
         </div>
       </div>
       <PassStub />
-      <PassNotches />
     </section>
   );
 }
