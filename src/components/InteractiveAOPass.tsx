@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { getPassIdentity, getTicketId, normalizeXUsername } from "../lib/pass-identity";
 import styles from "./interactive-ao-pass.module.css";
@@ -60,7 +60,7 @@ export function InteractiveAOPass({
     handleKeyDown,
   } = usePassInteraction({ flipped, setFlipped });
 
-  const { shareState, shareCard, downloadCard } = usePassShare({
+  const { shareState, toast, shareCard, downloadCard } = usePassShare({
     stageRef,
     username,
     flipped,
@@ -144,6 +144,24 @@ export function InteractiveAOPass({
           DOWNLOAD PASS
         </button>
       </div>
+
+      <AnimatePresence>
+        {toast ? (
+          <motion.div
+            key={toast.id}
+            role="status"
+            aria-live="polite"
+            className={styles.toast}
+            data-tone={toast.tone}
+            initial={{ opacity: 0, x: "-50%", y: 8, scale: 0.96 }}
+            animate={{ opacity: 1, x: "-50%", y: 0, scale: 1 }}
+            exit={{ opacity: 0, x: "-50%", y: 8, scale: 0.96 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+          >
+            {toast.message}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

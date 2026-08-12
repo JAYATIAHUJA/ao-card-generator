@@ -6,10 +6,18 @@ import { type MotionValue } from "motion/react";
 import {
   type MouseEvent as ReactMouseEvent,
   type RefObject,
+  useRef,
   useState,
 } from "react";
 
 export type ShareState = "idle" | "working" | "copied" | "saved" | "error";
+export type ShareToastTone = "success" | "warning" | "error";
+
+export interface ShareToast {
+  id: number;
+  message: string;
+  tone: ShareToastTone;
+}
 
 export const shareLabels: Record<ShareState, string> = {
   idle: "SHARE ON X",
@@ -18,6 +26,8 @@ export const shareLabels: Record<ShareState, string> = {
   saved: "PNG DOWNLOADED",
   error: "COULDN'T CAPTURE",
 };
+
+const TWITTER_OPEN_DELAY = 1100;
 
 interface UsePassShareOptions {
   stageRef: RefObject<HTMLDivElement | null>;
@@ -44,6 +54,29 @@ export function usePassShare({
   revealSource,
 }: UsePassShareOptions) {
   const [shareState, setShareState] = useState<ShareState>("idle");
+  const [toast, setToast] = useState<ShareToast | null>(null);
+  const toastTimeoutRef = useRef<number | null>(null);
+
+  const showToast = (message: string, tone: ShareToastTone = "success") => {
+    if (toastTimeoutRef.current) {
+      window.clearTimeout(toastTimeoutRef.current);
+    }
+    setToast({ id: Date.now(), message, tone });
+    toastTimeoutRef.current = window.setTimeout(() => {
+      setToast(null);
+      toastTimeoutRef.current = null;
+    }, 2800);
+  };
+
+  const openTwitterIntent = (message: string) => {
+    window.setTimeout(() => {
+      window.open(
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`,
+        "_blank",
+        "noopener",
+      );
+    }, TWITTER_OPEN_DELAY);
+  };
 
   const capturePass = async (): Promise<Blob | null> => {
     const stage = stageRef.current;
@@ -95,12 +128,48 @@ export function usePassShare({
     URL.revokeObjectURL(url);
   };
 
+  const getPngBlob = async (blob: Blob | null) => {
+    if (!blob) throw new Error("capture returned no image");
+    return blob.type === "image/png"
+      ? blob
+      : new Blob([await blob.arrayBuffer()], { type: "image/png" });
+  };
+
+  const copyPassToClipboard = (blobPromise: Promise<Blob | null>) => {
+    if (
+      typeof ClipboardItem === "undefined" ||
+      !navigator.clipboard ||
+      typeof navigator.clipboard.write !== "function"
+    ) {
+      return Promise.resolve(false);
+    }
+
+    try {
+      return navigator.clipboard.write([
+        new ClipboardItem({
+          "image/png": blobPromise.then(getPngBlob),
+        }),
+      ]).then(
+        () => true,
+        (error) => {
+          console.error("[share] image clipboard write failed", error);
+          return false;
+        },
+      );
+    } catch (error) {
+      console.error("[share] image clipboard write failed", error);
+      return Promise.resolve(false);
+    }
+  };
+
   const shareCard = async (event: ReactMouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     if (shareState === "working") return;
     setShareState("working");
     try {
-      const blob = await capturePass();
+      const blobPromise = capturePass();
+      const clipboardPromise = copyPassToClipboard(blobPromise);
+      const blob = await blobPromise;
       if (!blob) throw new Error("capture returned no image");
 
       const message = `Just got my pass for The Orchestra, AO's online hackathon. Your idea, an army of agents. Aug 12-13, online. aoagents.dev`;
@@ -114,6 +183,14 @@ export function usePassShare({
       const file = new File([blob], `orchestra-pass-${username.slice(1)}.png`, {
         type: "image/png",
       });
+      const copiedToClipboard = await clipboardPromise;
+      if (copiedToClipboard) {
+        showToast("Image copied to clipboard");
+        setShareState("copied");
+      } else {
+        showToast("Clipboard image copy is blocked on this device", "warning");
+      }
+
       if (isMobile && navigator.canShare?.({ files: [file] })) {
         try {
           await navigator.share({ files: [file], text: message, title: "The Orchestra" });
@@ -123,21 +200,16 @@ export function usePassShare({
         return;
       }
 
-      try {
-        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-        setShareState("copied");
-      } catch {
-        // Clipboard image writes need permission; fall back to a download.
+      if (!copiedToClipboard) {
+        // Clipboard image writes need browser support and permission; fall back
+        // to a download so the user still has the PNG.
         downloadPass(blob);
         setShareState("saved");
       }
 
-      window.open(
-        `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`,
-        "_blank",
-        "noopener",
-      );
+      openTwitterIntent(message);
     } catch {
+      showToast("Couldn't capture the image", "error");
       setShareState("error");
     } finally {
       window.setTimeout(() => setShareState("idle"), 2400);
@@ -149,16 +221,25 @@ export function usePassShare({
     if (shareState === "working") return;
     setShareState("working");
     try {
-      const blob = await capturePass();
+      const blobPromise = capturePass();
+      const clipboardPromise = copyPassToClipboard(blobPromise);
+      const blob = await blobPromise;
       if (!blob) throw new Error("capture returned no image");
       downloadPass(blob);
+      const copiedToClipboard = await clipboardPromise;
+      if (copiedToClipboard) {
+        showToast("Image copied to clipboard");
+      } else {
+        showToast("Downloaded, but clipboard image copy is blocked", "warning");
+      }
       setShareState("saved");
     } catch {
+      showToast("Couldn't capture the image", "error");
       setShareState("error");
     } finally {
       window.setTimeout(() => setShareState("idle"), 2400);
     }
   };
 
-  return { shareState, shareCard, downloadCard };
+  return { shareState, toast, shareCard, downloadCard };
 }
