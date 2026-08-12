@@ -7,7 +7,7 @@
 
 :root {
   color-scheme: dark;
-  background: #130b09;
+  background: #0d0d0d;
 }
 
 html,
@@ -17,7 +17,7 @@ body {
 
 body {
   margin: 0;
-  background: #130b09;
+  background: #0d0d0d;
 }
 
 button,
