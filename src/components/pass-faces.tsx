@@ -31,6 +31,7 @@ function ShaderLayer({
 function PassStub() {
   return (
     <aside className={styles.stub}>
+      <span className={styles.stubBarcode} aria-hidden="true" />
       <span className={styles.stubYear} aria-hidden="true">
         2026
       </span>
@@ -88,14 +89,20 @@ export function PassFrontFace({
     >
       <ShaderLayer {...shader} />
       <span className={styles.logoField} aria-hidden="true" />
+      <span className={styles.shineSweep} aria-hidden="true" />
       <div className={styles.frontCopy} data-with-photo={showPhoto ? "true" : "false"}>
         <div className={styles.eyebrowGroup}>
           <p className={styles.eyebrow}>AGENT ORCHESTRATOR PRESENTS</p>
-          <p className={styles.eyebrow}>{eventName.toUpperCase()} · 2026</p>
+          <p className={styles.hackName}>
+            {eventName.toUpperCase()}
+            <span className={styles.hackYear}>· 2026</span>
+          </p>
         </div>
         <div
           className={styles.identityRow}
-          data-name-length={identity.length > 14 ? "long" : "short"}
+          data-name-length={
+            identity.length > 14 ? "long" : identity.length > 8 ? "medium" : "short"
+          }
         >
           {showPhoto ? (
             <span className={styles.photoFrame}>
@@ -107,10 +114,6 @@ export function PassFrontFace({
                 alt={`${identity}'s profile`}
                 onError={() => setPhotoFailed(true)}
               />
-              <span className={styles.photoShader} aria-hidden="true">
-                <ShaderLayer {...shader} />
-              </span>
-              <span className={styles.photoGrain} aria-hidden="true" />
             </span>
           ) : null}
           <div className={styles.identityBlock}>
@@ -121,8 +124,18 @@ export function PassFrontFace({
         {teamName?.trim() ? (
           <p className={styles.teamLine}>TEAM {teamName.trim().toUpperCase()}</p>
         ) : null}
-        <div className={styles.frontTag}>
-          <p className={styles.tagline}>BUILD · BREAK · SHIP · REPEAT</p>
+        {/* The visible "SPONSORED BY" label names this group; a bare
+            aria-label on a generic div would not be exposed anyway. */}
+        <div className={styles.sponsorRow}>
+          <span className={styles.sponsorLabel}>SPONSORED BY</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={styles.sponsorLogo} src="/sponsors/maximor.svg" alt="Maximor" />
+          <span className={styles.sponsorChip}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className={styles.sponsorChipLogo} src="/sponsors/tensormux.png" alt="TensorMux" />
+          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={styles.sponsorLogo} src="/sponsors/dodo-payments-dark.webp" alt="Dodo Payments" />
         </div>
         <div className={styles.frontFooter}>
           <p className={styles.passType}>{passType.toUpperCase()}</p>

@@ -165,7 +165,7 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
-  padding: 6.4% 5.8% 6.1% 6.2%;
+  padding: 6.4% 5.8% 5.4% 6.2%;
 }
 
 .eyebrow,
@@ -194,6 +194,30 @@
   font-size: clamp(11px, 2.3cqw, 20px);
 }
 
+/* The hackathon name is the headline of the card — big display type right
+   under the presenter eyebrow. */
+.hackName {
+  display: flex;
+  align-items: baseline;
+  gap: 1.4cqw;
+  margin: 0.4cqw 0 0;
+  color: var(--ink-cream);
+  font-family: var(--font-geist-pixel-square), var(--font-geist-sans), sans-serif;
+  font-size: clamp(22px, 5.2cqw, 48px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.hackYear {
+  color: rgb(245 232 204 / 72%);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: clamp(10px, 2cqw, 18px);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
 .identity,
 .mission {
   margin: 0;
@@ -205,14 +229,14 @@
 .identityRow {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 3.5cqw;
+  gap: 3.2cqw;
   align-items: center;
   margin: auto 0;
   min-width: 0;
 }
 
 .frontCopy[data-with-photo="true"] .identityRow {
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .photoFrame {
@@ -221,9 +245,15 @@
   aspect-ratio: 1;
   min-width: 0;
   overflow: hidden;
-  border-radius: 7px;
+  border: 1px solid rgb(245 232 204 / 26%);
+  border-radius: 8px;
+  box-shadow: 0 3px 14px rgb(4 16 38 / 50%);
 }
 
+/* The avatar keeps its own colours. Only element-local filters are used — a
+   mix-blend-mode tint would not survive the export capture, which reproduces
+   neither the shader canvas nor blend modes, so the photo would look one way
+   on screen and another in the downloaded PNG. */
 .photoImg {
   position: absolute;
   inset: 0;
@@ -231,30 +261,8 @@
   height: 100%;
   object-fit: cover;
   object-position: 50% 30%;
-  filter: saturate(0.82) contrast(1.04) brightness(1.06);
-  mix-blend-mode: luminosity;
-  opacity: 0.9;
-}
-
-.photoShader {
-  position: absolute;
-  inset: 0;
-  mix-blend-mode: overlay;
-  opacity: 0.85;
-  pointer-events: none;
-}
-
-.photoGrain {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at var(--light-x) var(--light-y), rgb(255 255 255 / 30%), transparent 42%),
-    radial-gradient(circle at 38% 32%, transparent 0 0.5px, rgb(10 25 45 / 42%) 0.9px, transparent 1.3px),
-    radial-gradient(circle at 72% 68%, transparent 0 0.4px, rgb(245 250 255 / 16%) 0.8px, transparent 1.2px);
-  background-position: 0 0, var(--grain-x) var(--grain-y), calc(var(--grain-x) * -1) calc(var(--grain-y) * -1);
-  background-size: auto, 3px 3px, 4px 4px;
-  mix-blend-mode: soft-light;
-  pointer-events: none;
+  filter: saturate(1.04) contrast(1.03);
+  opacity: 1;
 }
 
 .identityBlock {
@@ -267,11 +275,11 @@
 
 .identity {
   max-width: 100%;
-  overflow: hidden;
+  overflow-wrap: break-word;
   color: var(--ink-cream);
   font-size: clamp(26px, 7.4cqw, 66px);
   letter-spacing: -0.02em;
-  line-height: 0.88;
+  line-height: 0.92;
 }
 
 .fromLine {
@@ -286,16 +294,23 @@
   text-transform: uppercase;
 }
 
+/* With a photo the name shares the row, so it is sized by how much of that
+   space the name actually needs. */
 .frontCopy[data-with-photo="true"] .identity {
+  font-size: clamp(26px, 8.4cqw, 74px);
+}
+
+.frontCopy[data-with-photo="true"] .identityRow[data-name-length="medium"] .identity {
   font-size: clamp(22px, 6.4cqw, 56px);
 }
 
 .frontCopy[data-with-photo="true"] .identityRow[data-name-length="long"] .identity {
-  font-size: clamp(17px, 4.5cqw, 38px);
+  font-size: clamp(18px, 4.8cqw, 42px);
 }
 
 .frontCopy[data-with-photo="true"] .fromLine {
-  font-size: clamp(12px, 2.5cqw, 22px);
+  margin-top: 1.9cqw;
+  font-size: clamp(12px, 2.6cqw, 23px);
 }
 
 .teamLine {
@@ -310,10 +325,11 @@
 }
 
 .frontCopy[data-with-photo="true"] .teamLine {
-  margin-left: calc(21cqw + 4.6cqw);
+  margin-left: calc(23cqw + 3.2cqw);
 }
 
 .eyebrow,
+.hackName,
 .identity,
 .fromLine,
 .passType,
@@ -327,20 +343,54 @@
     calc(var(--emboss-x, 0px) * -1) calc(var(--emboss-y, 0px) * -1) 0 rgb(255 255 255 / 16%);
 }
 
-.frontTag {
+.sponsorRow {
+  display: flex;
+  align-items: center;
+  gap: 2.6cqw;
+  /* No margin of its own — the identity row's auto margins centre the block,
+     which keeps the space above and below the photo even. */
   margin-top: 0;
 }
 
-.tagline {
-  margin: 0;
-  color: var(--ink-cream);
+.sponsorLabel {
+  color: rgb(245 232 204 / 62%);
   font-family: var(--font-geist-mono), monospace;
-  font-size: clamp(9px, 1.9cqw, 16px);
+  font-size: clamp(7px, 1.4cqw, 12px);
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
   line-height: 1;
-  text-transform: uppercase;
-  opacity: 0.82;
+  white-space: nowrap;
+}
+
+.sponsorLogo {
+  width: auto;
+  height: clamp(15px, 3.4cqw, 30px);
+  filter: drop-shadow(0 1px 2px rgb(4 16 38 / 45%));
+}
+
+/* The TensorMux asset is a 1200x630 social card, not a logo — mostly empty
+   space around the wordmark. The chip crops to the wordmark band so it reads
+   at the same weight as the other marks. */
+.sponsorChip {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: clamp(58px, 9.6cqw, 85px);
+  height: clamp(18px, 3.1cqw, 27px);
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 1px 3px rgb(4 16 38 / 40%);
+}
+
+.sponsorChipLogo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 104%;
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, -50%);
 }
 
 .frontFooter {
@@ -378,7 +428,65 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-left: 2px dashed rgb(35 8 6 / 46%);
+  /* The perforation reads as a torn edge, so it is drawn in the card's ink
+     rather than a dark line that disappears into the navy. */
+  border-left: 2px dashed rgb(245 232 204 / 62%);
+}
+
+/* Vertical barcode strip hugging the perforation — sells the "real ticket". */
+.stubBarcode {
+  position: absolute;
+  top: 12%;
+  bottom: 12%;
+  left: 5%;
+  width: 2.1cqw;
+  background: repeating-linear-gradient(
+    180deg,
+    rgb(245 232 204 / 55%) 0 2px,
+    transparent 2px 5px,
+    rgb(245 232 204 / 55%) 5px 6px,
+    transparent 6px 11px,
+    rgb(245 232 204 / 55%) 11px 14px,
+    transparent 14px 17px
+  );
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* One-shot foil flash that sweeps the card right after it lands. */
+.shineSweep {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgb(220 240 255 / 22%) 47%,
+    rgb(255 250 235 / 34%) 50%,
+    rgb(220 240 255 / 22%) 53%,
+    transparent 62%
+  );
+  background-repeat: no-repeat;
+  background-size: 60% 100%;
+  background-position: -80% 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .shineSweep {
+    animation: shine-sweep 1.15s cubic-bezier(0.4, 0, 0.2, 1) 0.75s 1 both;
+  }
+}
+
+@keyframes shine-sweep {
+  from {
+    background-position: -80% 0;
+  }
+
+  to {
+    background-position: 210% 0;
+  }
 }
 
 .stubYear {
@@ -483,7 +591,7 @@
   display: block;
   border: 1px solid rgb(230 199 161 / 15%);
   border-radius: 50%;
-  background: #130b09;
+  background: #000;
   box-shadow: inset 0 0 7px rgb(0 0 0 / 42%);
   pointer-events: none;
 }
@@ -524,19 +632,96 @@
   }
 }
 
+/* Phones show the same ticket, just smaller. Every size inside the card is
+   already expressed in cqw, so the layout scales with the card on its own —
+   what stops it are the clamp() lower bounds, which are sized for the desktop
+   card and would otherwise hold text and logos at widths the small card
+   cannot fit. Lowering those bounds here lets the whole design shrink in
+   proportion rather than bursting out of the card. */
 @media (max-width: 620px) {
   .stage {
-    width: min(94vw, 520px);
+    /* Matches the page's 22px side padding, so the card never runs past the
+       viewport edge the way `94vw` did. */
+    width: min(520px, calc(100vw - 44px));
   }
 
   .frontCopy {
     padding-left: 5.5%;
   }
 
-  .tagline {
-    font-size: clamp(7px, 1.6cqw, 14px);
-    letter-spacing: 0.06em;
-    white-space: nowrap;
+  .eyebrow,
+  .detailLabel,
+  .dateLine,
+  .backMeta {
+    font-size: clamp(5px, 1.72cqw, 14px);
+  }
+
+  .eyebrow {
+    font-size: clamp(6px, 2.3cqw, 20px);
+  }
+
+  .hackName {
+    font-size: clamp(13px, 5.2cqw, 48px);
+  }
+
+  .hackYear {
+    font-size: clamp(6px, 2cqw, 18px);
+  }
+
+  .identity {
+    font-size: clamp(16px, 7.4cqw, 66px);
+  }
+
+  .fromLine {
+    font-size: clamp(8px, 3.4cqw, 30px);
+  }
+
+  .frontCopy[data-with-photo="true"] .identity {
+    font-size: clamp(16px, 8.4cqw, 74px);
+  }
+
+  .frontCopy[data-with-photo="true"] .identityRow[data-name-length="medium"] .identity {
+    font-size: clamp(14px, 6.4cqw, 56px);
+  }
+
+  .frontCopy[data-with-photo="true"] .identityRow[data-name-length="long"] .identity {
+    font-size: clamp(12px, 4.8cqw, 42px);
+  }
+
+  .frontCopy[data-with-photo="true"] .fromLine {
+    font-size: clamp(7px, 2.6cqw, 23px);
+  }
+
+  .photoFrame {
+    width: 21cqw;
+  }
+
+  .frontCopy[data-with-photo="true"] .teamLine {
+    margin-left: calc(21cqw + 3.2cqw);
+  }
+
+  .teamLine {
+    font-size: clamp(5px, 1.6cqw, 14px);
+  }
+
+  /* The sponsor strip is the tightest row on the card, so it gets a shorter
+     label and slightly smaller marks to stay inside the perforation. */
+  .sponsorRow {
+    gap: 1.5cqw;
+  }
+
+  .sponsorLabel {
+    font-size: clamp(6px, 1.8cqw, 12px);
+    letter-spacing: 0.1em;
+  }
+
+  .sponsorLogo {
+    height: clamp(8px, 2.7cqw, 30px);
+  }
+
+  .sponsorChip {
+    width: clamp(23px, 7.7cqw, 85px);
+    height: clamp(8px, 2.6cqw, 27px);
   }
 
   .frontFooter {
@@ -544,12 +729,28 @@
   }
 
   .passType {
-    font-size: clamp(10px, 2.4cqw, 22px);
+    font-size: clamp(8px, 3.1cqw, 27px);
     white-space: nowrap;
   }
 
   .dateLine {
-    font-size: clamp(8px, 1.8cqw, 15px);
+    font-size: clamp(6px, 2.1cqw, 18px);
+  }
+
+  .stubText {
+    font-size: clamp(13px, 5.4cqw, 48px);
+  }
+
+  .stubYear {
+    font-size: clamp(30px, 13.5cqw, 118px);
+  }
+
+  .mission {
+    font-size: clamp(16px, 6.4cqw, 96px);
+  }
+
+  .detailValue {
+    font-size: clamp(7px, 2.35cqw, 20px);
   }
 
   .backDetails {
@@ -720,6 +921,13 @@
 
 .stage[data-capturing="true"] .back {
   display: none;
+}
+
+/* Freeze the shine sweep in its finished state during capture so a
+   mid-animation frame never leaks into the PNG. */
+.stage[data-capturing="true"] .shineSweep {
+  animation: none !important;
+  background-position: -80% 0 !important;
 }
 
 .copyNotice {

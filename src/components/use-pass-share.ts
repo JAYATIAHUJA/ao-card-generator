@@ -7,7 +7,6 @@ import {
   useState,
 } from "react";
 import {
-  captureBackdrop,
   captureLiveCard,
   composePassPng,
   downloadBlob,
@@ -34,7 +33,6 @@ const TWITTER_OPEN_DELAY = 1100;
 
 interface UsePassShareOptions {
   stageRef: RefObject<HTMLDivElement | null>;
-  backdropRef: RefObject<HTMLDivElement | null>;
   username: string;
   /** Changes whenever the card content changes, invalidating the cached PNG. */
   identityKey: string;
@@ -49,7 +47,6 @@ interface UsePassShareOptions {
  */
 export function usePassShare({
   stageRef,
-  backdropRef,
   username,
   identityKey,
 }: UsePassShareOptions) {
@@ -57,6 +54,7 @@ export function usePassShare({
   const [toast, setToast] = useState<ShareToast | null>(null);
   const toastTimeoutRef = useRef<number | null>(null);
   const cacheRef = useRef<{ key: string; blob: Blob } | null>(null);
+  const inFlightRef = useRef<{ key: string; promise: Promise<Blob | null> } | null>(null);
 
   const showToast = (message: string, tone: ShareToastTone = "success") => {
     if (toastTimeoutRef.current) {
@@ -79,19 +77,33 @@ export function usePassShare({
     }, TWITTER_OPEN_DELAY);
   };
 
-  const getBlob = async (): Promise<Blob | null> => {
-    if (cacheRef.current?.key === identityKey) return cacheRef.current.blob;
+  // Single-flight: the auto-copy on mount and a user's share/download click
+  // can request the PNG at the same time; running two live-DOM captures at
+  // once is slow and races on the capture pinning, so they share one promise.
+  const getBlob = (): Promise<Blob | null> => {
+    if (cacheRef.current?.key === identityKey) {
+      return Promise.resolve(cacheRef.current.blob);
+    }
+    if (inFlightRef.current?.key === identityKey) {
+      return inFlightRef.current.promise;
+    }
     const stage = stageRef.current;
-    const backdrop = backdropRef.current;
-    if (!stage) return null;
-    const [backdropBlob, cardBlob] = await Promise.all([
-      backdrop ? captureBackdrop(backdrop) : Promise.resolve(null),
-      captureLiveCard(stage),
-    ]);
-    if (!cardBlob) return null;
-    const blob = await composePassPng(backdropBlob, cardBlob);
-    if (blob) cacheRef.current = { key: identityKey, blob };
-    return blob;
+    if (!stage) return Promise.resolve(null);
+    const promise = (async () => {
+      try {
+        const cardBlob = await captureLiveCard(stage);
+        if (!cardBlob) return null;
+        const blob = await composePassPng(cardBlob);
+        if (blob) cacheRef.current = { key: identityKey, blob };
+        return blob;
+      } finally {
+        if (inFlightRef.current?.key === identityKey) {
+          inFlightRef.current = null;
+        }
+      }
+    })();
+    inFlightRef.current = { key: identityKey, promise };
+    return promise;
   };
 
   const getPngBlob = async (blob: Blob | null) => {
@@ -107,6 +119,10 @@ export function usePassShare({
       !navigator.clipboard ||
       typeof navigator.clipboard.write !== "function"
     ) {
+      // Nothing consumes the blob on this path (e.g. Firefox), so its failure
+      // would surface as an unhandled rejection. Callers that need the blob
+      // await it themselves and report the error there.
+      blobPromise.catch(() => {});
       return Promise.resolve(false);
     }
 
@@ -138,7 +154,7 @@ export function usePassShare({
       const blob = await blobPromise;
       if (!blob) throw new Error("capture returned no image");
 
-      const message = `Just got my pass for The Orchestra, AO's online hackathon. Your idea, an army of agents. Aug 12-13, online. aoagents.dev`;
+      const message = `Just got my pass for Syndicate, AO's online hackathon. Your idea, an army of agents. September 5-6, 2026, online. aoagents.dev`;
 
       // Phones only: the native share sheet carries the image straight into
       // the X app, which the web intent URL cannot do. Desktop browsers
@@ -146,7 +162,7 @@ export function usePassShare({
       // OS share sheet is a dead end for X — so desktop always falls through
       // to clipboard + intent URL below.
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const file = new File([blob], `orchestra-pass-${username.slice(1)}.png`, {
+      const file = new File([blob], `syndicate-pass-${username.slice(1)}.png`, {
         type: "image/png",
       });
       const copiedToClipboard = await clipboardPromise;
@@ -159,7 +175,7 @@ export function usePassShare({
 
       if (isMobile && navigator.canShare?.({ files: [file] })) {
         try {
-          await navigator.share({ files: [file], text: message, title: "The Orchestra" });
+          await navigator.share({ files: [file], text: message, title: "Syndicate" });
         } catch {
           // The user dismissed the share sheet; nothing more to do.
         }

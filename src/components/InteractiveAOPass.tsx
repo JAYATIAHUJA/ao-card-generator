@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { getPassIdentity, getTicketId, normalizeXUsername } from "../lib/pass-identity";
 import styles from "./interactive-ao-pass.module.css";
 import { PassBackFace, PassFrontFace } from "./pass-faces";
-import { ExportBackdrop } from "./ExportBackdrop";
 import { usePassInteraction, restingMaterial } from "./use-pass-interaction";
 import { shareLabels, usePassShare } from "./use-pass-share";
 
@@ -28,8 +27,8 @@ export function InteractiveAOPass({
   passType = "Participant Pass",
   teamName,
   ticketId,
-  eventName = "The Orchestra",
-  date = "Aug 12–13",
+  eventName = "Syndicate",
+  date = "Sep 5–6",
   format = "Online",
 }: InteractiveAOPassProps) {
   const [flipped, setFlipped] = useState(false);
@@ -58,30 +57,33 @@ export function InteractiveAOPass({
     handleKeyDown,
   } = usePassInteraction({ flipped, setFlipped });
 
-  const backdropRef = useRef<HTMLDivElement | null>(null);
   const identityKey = [username, identity, photo ?? ""].join("|");
   const { shareState, toast, shareCard, downloadCard, autoCopy } = usePassShare({
     stageRef,
-    backdropRef,
     username,
     identityKey,
   });
 
-  // Generate → copy: as soon as the card content is known, render the export
-  // PNG and put it on the clipboard. Browsers may refuse a clipboard write
-  // this far from the user's click; in that case a notice points at the
-  // share button (a fresh gesture, which will succeed).
+  // Generate → copy: once the card content is known, render the export PNG
+  // and put it on the clipboard. The capture is deferred until the entrance
+  // animation has settled so it never competes with it for the main thread.
+  // Browsers may refuse a clipboard write this far from the user's click; in
+  // that case a notice points at the share button (a fresh gesture, which
+  // will succeed).
   const [autoCopyFailed, setAutoCopyFailed] = useState(false);
   const autoCopyRef = useRef(autoCopy);
   autoCopyRef.current = autoCopy;
   useEffect(() => {
     let cancelled = false;
     setAutoCopyFailed(false);
-    void autoCopyRef.current().then((copied) => {
-      if (!cancelled) setAutoCopyFailed(!copied);
-    });
+    const timeout = window.setTimeout(() => {
+      void autoCopyRef.current().then((copied) => {
+        if (!cancelled) setAutoCopyFailed(!copied);
+      });
+    }, 1200);
     return () => {
       cancelled = true;
+      window.clearTimeout(timeout);
     };
   }, [identityKey]);
 
@@ -183,8 +185,6 @@ export function InteractiveAOPass({
           </motion.div>
         ) : null}
       </AnimatePresence>
-
-      <ExportBackdrop rootRef={backdropRef} />
     </div>
   );
 }

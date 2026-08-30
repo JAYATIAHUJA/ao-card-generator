@@ -279,7 +279,9 @@ export function PaperShader({
     const material = { x: 0, y: 0, foilX: 0, foilY: 0, speed: 0 };
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // 1.5x is visually indistinguishable on this soft, grainy material and
+      // costs roughly half the fragment work of 2x on high-DPI screens.
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const width = Math.max(1, Math.round(canvas.clientWidth * dpr));
       const height = Math.max(1, Math.round(canvas.clientHeight * dpr));
       if (canvas.width !== width || canvas.height !== height) {
