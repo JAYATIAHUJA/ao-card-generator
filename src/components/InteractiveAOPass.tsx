@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { withBasePath } from "../lib/base-path";
 import { getPassIdentity, getTicketId, normalizeXUsername } from "../lib/pass-identity";
 import styles from "./interactive-ao-pass.module.css";
 import { PassBackFace, PassFrontFace } from "./pass-faces";
@@ -114,7 +115,12 @@ export function InteractiveAOPass({
         onPointerUp={endOrbit}
         onPointerCancel={endOrbit}
         onPointerLeave={handlePointerLeave}
-        style={{ ...restingMaterial, rotateX: tiltX, rotateY: tiltY }}
+        style={{
+          ...restingMaterial,
+          rotateX: tiltX,
+          rotateY: tiltY,
+          "--logo-scatter": `url("${withBasePath("/ao-logo-scatter.svg")}")`,
+        } as React.CSSProperties}
       >
         <span className={styles.contactShadow} aria-hidden="true" />
 

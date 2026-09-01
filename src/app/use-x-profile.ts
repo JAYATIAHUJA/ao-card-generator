@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { withBasePath } from "../lib/base-path";
 
 export interface XProfile {
   name?: string;
@@ -17,14 +18,14 @@ export function useXProfile(submittedHandle: string | null) {
   useEffect(() => {
     if (!submittedHandle) return;
     const controller = new AbortController();
-    fetch(`/api/x-profile?u=${submittedHandle}`, { signal: controller.signal })
+    fetch(withBasePath(`/api/x-profile?u=${submittedHandle}`), { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
       .then((data: { name?: string | null; photo?: string | null } | null) => {
         if (!data) return;
         setProfile({
           name: data.name ?? undefined,
           photo: data.photo
-            ? `/api/x-avatar?u=${encodeURIComponent(submittedHandle)}`
+            ? withBasePath(`/api/x-avatar?u=${encodeURIComponent(submittedHandle)}`)
             : undefined,
         });
       })

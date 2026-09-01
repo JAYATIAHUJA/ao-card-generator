@@ -5,6 +5,7 @@ import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import { useState } from "react";
 import { ChromaticWaves } from "../components/ChromaticWaves";
 import { InteractiveAOPass } from "../components/InteractiveAOPass";
+import { withBasePath } from "../lib/base-path";
 import { useXProfile } from "./use-x-profile";
 
 const enterEase = [0.16, 1, 0.3, 1] as const;
@@ -185,7 +186,7 @@ export default function IntroPage() {
                     aria-label="Agent Orchestrator"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img className="size-5 translate-y-[1px]" src="/ao-logo.svg" alt="" aria-hidden="true" />
+                    <img className="size-5 translate-y-[1px]" src={withBasePath("/ao-logo.svg")} alt="" aria-hidden="true" />
                     <span className="block text-[11px] font-medium leading-none tracking-[0.16em] text-white/50">
                       AO HACKATHON
                     </span>
@@ -202,7 +203,7 @@ export default function IntroPage() {
                       aria-label="Maximor"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="h-auto w-full max-w-[126px] -translate-y-[6px] sm:max-w-[188px] sm:-translate-y-[11px]" src="/sponsors/maximor.svg" alt="Maximor" />
+                      <img className="h-auto w-full max-w-[126px] -translate-y-[6px] sm:max-w-[188px] sm:-translate-y-[11px]" src={withBasePath("/sponsors/maximor.svg")} alt="Maximor" />
                     </a>
                     <a
                       className="grid h-8 min-w-0 place-items-center opacity-75 transition-opacity hover:opacity-100 sm:h-9"
@@ -212,7 +213,7 @@ export default function IntroPage() {
                       aria-label="Dodo Payments"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="w-full max-w-[118px] sm:max-w-[132px]" src="/sponsors/dodo-payments-dark.webp" alt="Dodo Payments" />
+                      <img className="w-full max-w-[118px] sm:max-w-[132px]" src={withBasePath("/sponsors/dodo-payments-dark.webp")} alt="Dodo Payments" />
                     </a>
                     <a
                       className="grid h-8 min-w-0 place-items-center opacity-75 transition-opacity hover:opacity-100 sm:h-9"
@@ -222,7 +223,7 @@ export default function IntroPage() {
                       aria-label="Neatlogs"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="w-full max-w-[136px] opacity-90 [filter:invert(1)_brightness(1.7)_drop-shadow(0_1px_2px_rgb(0_0_0_/_0.35))] sm:max-w-[158px]" src="/sponsors/neatlogs-lockup.svg" alt="Neatlogs" />
+                      <img className="w-full max-w-[136px] opacity-90 [filter:invert(1)_brightness(1.7)_drop-shadow(0_1px_2px_rgb(0_0_0_/_0.35))] sm:max-w-[158px]" src={withBasePath("/sponsors/neatlogs-lockup.svg")} alt="Neatlogs" />
                     </a>
                     <a
                       className="relative mx-auto h-8 w-full max-w-[124px] overflow-hidden rounded-sm bg-white opacity-75 transition-opacity hover:opacity-100 sm:h-9 sm:max-w-[142px]"
@@ -234,7 +235,7 @@ export default function IntroPage() {
                       {/* Width is relative so the wordmark scales with its box
                           instead of being cropped on narrow screens. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="absolute top-1/2 left-1/2 w-[105%] max-w-none -translate-x-1/2 -translate-y-1/2" src="/sponsors/tensormux.png" alt="TensorMux" />
+                      <img className="absolute top-1/2 left-1/2 w-[105%] max-w-none -translate-x-1/2 -translate-y-1/2" src={withBasePath("/sponsors/tensormux.png")} alt="TensorMux" />
                     </a>
                   </div>
                 </motion.div>

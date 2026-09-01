@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-static";
+
 /**
  * Serves the X avatar same-origin. Cross-origin images load fine in <img> but
  * fail inside the share capture (html-to-image re-fetches them with CORS), so

@@ -138,7 +138,7 @@
     );
   mask-image:
     linear-gradient(var(--reveal-angle, -90deg), rgb(0 0 0) 0%, transparent 74%),
-    url("/ao-logo-scatter.svg");
+    var(--logo-scatter, url("/ao-logo-scatter.svg"));
   mask-composite: intersect;
   mask-position: center, center;
   mask-repeat: no-repeat, repeat;

@@ -2,6 +2,7 @@
 
 import { type MotionValue } from "motion/react";
 import { useState } from "react";
+import { withBasePath } from "../lib/base-path";
 import styles from "./interactive-ao-pass.module.css";
 import { PaperShader } from "./PaperShader";
 
@@ -129,14 +130,14 @@ export function PassFrontFace({
         <div className={styles.sponsorRow}>
           <span className={styles.sponsorLabel}>SPONSORED BY</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoMaximor}`} src="/sponsors/maximor.svg" alt="Maximor" />
+          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoMaximor}`} src={withBasePath("/sponsors/maximor.svg")} alt="Maximor" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoDodo}`} src="/sponsors/dodo-payments-dark.webp" alt="Dodo Payments" />
+          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoDodo}`} src={withBasePath("/sponsors/dodo-payments-dark.webp")} alt="Dodo Payments" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoNeatlogs}`} src="/sponsors/neatlogs-lockup.svg" alt="Neatlogs" />
+          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoNeatlogs}`} src={withBasePath("/sponsors/neatlogs-lockup.svg")} alt="Neatlogs" />
           <span className={styles.sponsorChip}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className={styles.sponsorChipLogo} src="/sponsors/tensormux.png" alt="TensorMux" />
+            <img className={styles.sponsorChipLogo} src={withBasePath("/sponsors/tensormux.png")} alt="TensorMux" />
           </span>
         </div>
         <div className={styles.frontFooter}>

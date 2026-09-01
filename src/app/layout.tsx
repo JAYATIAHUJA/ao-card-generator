@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { GeistPixelSquare } from "geist/font/pixel";
 import { Inter } from "next/font/google";
+import { withBasePath } from "../lib/base-path";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -10,7 +11,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "Syndicate | AO Participant Pass",
   description: "Your personalised admission pass for Syndicate, AO's online hackathon.",
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: withBasePath("/favicon.svg") },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
