@@ -193,7 +193,7 @@ export default function IntroPage() {
                   <p className="mt-7 text-[11px] font-medium tracking-[0.22em] text-white/40">
                     SPONSORED BY
                   </p>
-                  <div className="mx-auto mt-4 grid w-full max-w-[390px] grid-cols-[1.25fr_1fr_1fr_1fr] items-center gap-3 sm:max-w-[640px] sm:gap-6">
+                  <div className="mx-auto mt-4 grid w-full max-w-[320px] grid-cols-2 items-center gap-x-8 gap-y-4 sm:max-w-[640px] sm:grid-cols-[1.25fr_1fr_1fr_1fr] sm:gap-6">
                     <a
                       className="grid h-8 min-w-0 place-items-center opacity-90 transition-opacity hover:opacity-100 sm:h-10"
                       href="https://maximor.ai"
@@ -202,7 +202,7 @@ export default function IntroPage() {
                       aria-label="Maximor"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="h-auto w-full max-w-[128px] -translate-y-2 sm:max-w-[188px] sm:-translate-y-[11px]" src="/sponsors/maximor.svg" alt="Maximor" />
+                      <img className="h-auto w-full max-w-[126px] -translate-y-[6px] sm:max-w-[188px] sm:-translate-y-[11px]" src="/sponsors/maximor.svg" alt="Maximor" />
                     </a>
                     <a
                       className="grid h-8 min-w-0 place-items-center opacity-75 transition-opacity hover:opacity-100 sm:h-9"
@@ -212,7 +212,7 @@ export default function IntroPage() {
                       aria-label="Dodo Payments"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="w-full max-w-[96px] sm:max-w-[132px]" src="/sponsors/dodo-payments-dark.webp" alt="Dodo Payments" />
+                      <img className="w-full max-w-[118px] sm:max-w-[132px]" src="/sponsors/dodo-payments-dark.webp" alt="Dodo Payments" />
                     </a>
                     <a
                       className="grid h-8 min-w-0 place-items-center opacity-75 transition-opacity hover:opacity-100 sm:h-9"
@@ -222,10 +222,10 @@ export default function IntroPage() {
                       aria-label="Neatlogs"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="w-full max-w-[118px] opacity-90 [filter:invert(1)_brightness(1.7)_drop-shadow(0_1px_2px_rgb(0_0_0_/_0.35))] sm:max-w-[158px]" src="/sponsors/neatlogs-lockup.svg" alt="Neatlogs" />
+                      <img className="w-full max-w-[136px] opacity-90 [filter:invert(1)_brightness(1.7)_drop-shadow(0_1px_2px_rgb(0_0_0_/_0.35))] sm:max-w-[158px]" src="/sponsors/neatlogs-lockup.svg" alt="Neatlogs" />
                     </a>
                     <a
-                      className="relative mx-auto h-8 w-full max-w-[108px] overflow-hidden rounded-sm bg-white opacity-75 transition-opacity hover:opacity-100 sm:h-9 sm:max-w-[142px]"
+                      className="relative mx-auto h-8 w-full max-w-[124px] overflow-hidden rounded-sm bg-white opacity-75 transition-opacity hover:opacity-100 sm:h-9 sm:max-w-[142px]"
                       href="https://tensormux.com"
                       target="_blank"
                       rel="noreferrer"
