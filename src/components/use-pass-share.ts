@@ -157,7 +157,7 @@ export function usePassShare({
       const message = [
         `I'm attending Syndicate, @aoagents' online hackathon.`,
         `Cash prizes are up for grabs, powered by @maximor_ai and supported by @dodopayments, @neatlogs, and @Tensormux.`,
-        `See you there!`,
+        `See you there! aoagents.dev/hackathons/syndicate`,
       ].join("\n\n");
 
       // Phones only: the native share sheet carries the image straight into
