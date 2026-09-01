@@ -92,10 +92,10 @@ export function PassFrontFace({
       <span className={styles.shineSweep} aria-hidden="true" />
       <div className={styles.frontCopy} data-with-photo={showPhoto ? "true" : "false"}>
         <div className={styles.eyebrowGroup}>
-          <p className={styles.eyebrow}>AGENT ORCHESTRATOR PRESENTS</p>
+          <p className={styles.eyebrow}>AO HACKATHON</p>
           <p className={styles.hackName}>
             {eventName.toUpperCase()}
-            <span className={styles.hackYear}>· 2026</span>
+            <span className={styles.hackYear}>· BY MAXIMOR</span>
           </p>
         </div>
         <div
@@ -124,18 +124,20 @@ export function PassFrontFace({
         {teamName?.trim() ? (
           <p className={styles.teamLine}>TEAM {teamName.trim().toUpperCase()}</p>
         ) : null}
-        {/* The visible "SPONSORED BY" label names this group; a bare
+        {/* The visible sponsors/partners label names this group; a bare
             aria-label on a generic div would not be exposed anyway. */}
         <div className={styles.sponsorRow}>
           <span className={styles.sponsorLabel}>SPONSORED BY</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className={styles.sponsorLogo} src="/sponsors/maximor.svg" alt="Maximor" />
+          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoMaximor}`} src="/sponsors/maximor.svg" alt="Maximor" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoDodo}`} src="/sponsors/dodo-payments-dark.webp" alt="Dodo Payments" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoNeatlogs}`} src="/sponsors/neatlogs-lockup.svg" alt="Neatlogs" />
           <span className={styles.sponsorChip}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className={styles.sponsorChipLogo} src="/sponsors/tensormux.png" alt="TensorMux" />
           </span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className={styles.sponsorLogo} src="/sponsors/dodo-payments-dark.webp" alt="Dodo Payments" />
         </div>
         <div className={styles.frontFooter}>
           <p className={styles.passType}>{passType.toUpperCase()}</p>

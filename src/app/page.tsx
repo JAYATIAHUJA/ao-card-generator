@@ -175,21 +175,54 @@ export default function IntroPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1, duration: 0.6, ease: enterEase }}
                   className="mt-10"
-                  aria-label="Event sponsors"
+                  aria-label="Event host and sponsors"
                 >
-                  <p className="text-[11px] font-medium tracking-[0.22em] text-white/40">
+                  <a
+                    className="mx-auto inline-flex w-max items-center justify-center gap-2 opacity-75 transition-opacity hover:opacity-100"
+                    href="https://aoagents.dev"
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Agent Orchestrator"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img className="size-5 translate-y-[1px]" src="/ao-logo.svg" alt="" aria-hidden="true" />
+                    <span className="block text-[11px] font-medium leading-none tracking-[0.16em] text-white/50">
+                      AO HACKATHON
+                    </span>
+                  </a>
+                  <p className="mt-7 text-[11px] font-medium tracking-[0.22em] text-white/40">
                     SPONSORED BY
                   </p>
-                  <div className="mx-auto mt-4 grid w-full max-w-[360px] grid-cols-3 items-center gap-3 sm:max-w-[540px] sm:gap-6">
+                  <div className="mx-auto mt-4 grid w-full max-w-[390px] grid-cols-[1.25fr_1fr_1fr_1fr] items-center gap-3 sm:max-w-[640px] sm:gap-6">
                     <a
-                      className="grid h-8 min-w-0 place-items-center opacity-75 transition-opacity hover:opacity-100 sm:h-9"
+                      className="grid h-8 min-w-0 place-items-center opacity-90 transition-opacity hover:opacity-100 sm:h-10"
                       href="https://maximor.ai"
                       target="_blank"
                       rel="noreferrer"
                       aria-label="Maximor"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="h-auto w-full max-w-[104px] -translate-y-2 sm:max-w-[148px] sm:-translate-y-[10px]" src="/sponsors/maximor.svg" alt="Maximor" />
+                      <img className="h-auto w-full max-w-[128px] -translate-y-2 sm:max-w-[188px] sm:-translate-y-[11px]" src="/sponsors/maximor.svg" alt="Maximor" />
+                    </a>
+                    <a
+                      className="grid h-8 min-w-0 place-items-center opacity-75 transition-opacity hover:opacity-100 sm:h-9"
+                      href="https://dodopayments.com"
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Dodo Payments"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img className="w-full max-w-[96px] sm:max-w-[132px]" src="/sponsors/dodo-payments-dark.webp" alt="Dodo Payments" />
+                    </a>
+                    <a
+                      className="grid h-8 min-w-0 place-items-center opacity-75 transition-opacity hover:opacity-100 sm:h-9"
+                      href="https://neatlogs.com"
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Neatlogs"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img className="w-full max-w-[118px] opacity-90 [filter:invert(1)_brightness(1.7)_drop-shadow(0_1px_2px_rgb(0_0_0_/_0.35))] sm:max-w-[158px]" src="/sponsors/neatlogs-lockup.svg" alt="Neatlogs" />
                     </a>
                     <a
                       className="relative mx-auto h-8 w-full max-w-[108px] overflow-hidden rounded-sm bg-white opacity-75 transition-opacity hover:opacity-100 sm:h-9 sm:max-w-[142px]"
@@ -202,16 +235,6 @@ export default function IntroPage() {
                           instead of being cropped on narrow screens. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img className="absolute top-1/2 left-1/2 w-[105%] max-w-none -translate-x-1/2 -translate-y-1/2" src="/sponsors/tensormux.png" alt="TensorMux" />
-                    </a>
-                    <a
-                      className="grid h-8 min-w-0 place-items-center opacity-75 transition-opacity hover:opacity-100 sm:h-9"
-                      href="https://dodopayments.com"
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="Dodo Payments"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img className="w-full max-w-[108px] sm:max-w-[150px]" src="/sponsors/dodo-payments-dark.webp" alt="Dodo Payments" />
                     </a>
                   </div>
                 </motion.div>

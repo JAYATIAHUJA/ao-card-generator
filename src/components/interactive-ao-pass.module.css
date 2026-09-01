@@ -212,10 +212,12 @@
 
 .hackYear {
   color: rgb(245 232 204 / 72%);
-  font-family: var(--font-geist-mono), monospace;
-  font-size: clamp(10px, 2cqw, 18px);
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-family: inherit;
+  font-size: clamp(12px, 2.4cqw, 22px);
+  font-weight: inherit;
+  letter-spacing: 0.01em;
+  transform: translateY(0.03em);
+  white-space: nowrap;
 }
 
 .identity,
@@ -345,14 +347,16 @@
 
 .sponsorRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 2.6cqw;
+  gap: 1.3cqw 2.4cqw;
   /* No margin of its own — the identity row's auto margins centre the block,
      which keeps the space above and below the photo even. */
   margin-top: 0;
 }
 
 .sponsorLabel {
+  flex: 0 0 100%;
   color: rgb(245 232 204 / 62%);
   font-family: var(--font-geist-mono), monospace;
   font-size: clamp(7px, 1.4cqw, 12px);
@@ -364,8 +368,22 @@
 
 .sponsorLogo {
   width: auto;
-  height: clamp(15px, 3.4cqw, 30px);
   filter: drop-shadow(0 1px 2px rgb(4 16 38 / 45%));
+}
+
+.sponsorLogoMaximor {
+  height: clamp(18px, 3.55cqw, 31px);
+  margin: -0.5cqw 0 -0.6cqw;
+}
+
+.sponsorLogoDodo {
+  height: clamp(12px, 2.55cqw, 22px);
+}
+
+.sponsorLogoNeatlogs {
+  height: clamp(15px, 3cqw, 26px);
+  opacity: 0.86;
+  filter: invert(1) brightness(1.55) drop-shadow(0 1px 2px rgb(4 16 38 / 45%));
 }
 
 /* The TensorMux asset is a 1200x630 social card, not a logo — mostly empty
@@ -665,7 +683,7 @@
   }
 
   .hackYear {
-    font-size: clamp(6px, 2cqw, 18px);
+    font-size: clamp(7px, 2.4cqw, 22px);
   }
 
   .identity {
@@ -716,7 +734,20 @@
   }
 
   .sponsorLogo {
-    height: clamp(8px, 2.7cqw, 30px);
+    max-width: 23cqw;
+  }
+
+  .sponsorLogoMaximor {
+    height: clamp(10px, 3.05cqw, 31px);
+    margin: -0.4cqw 0 -0.5cqw;
+  }
+
+  .sponsorLogoDodo {
+    height: clamp(7px, 2.2cqw, 22px);
+  }
+
+  .sponsorLogoNeatlogs {
+    height: clamp(8px, 2.65cqw, 26px);
   }
 
   .sponsorChip {

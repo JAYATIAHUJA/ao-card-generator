@@ -28,7 +28,7 @@ export function InteractiveAOPass({
   teamName,
   ticketId,
   eventName = "Syndicate",
-  date = "Sep 5–6",
+  date = "Sep 5 - 7",
   format = "Online",
 }: InteractiveAOPassProps) {
   const [flipped, setFlipped] = useState(false);
