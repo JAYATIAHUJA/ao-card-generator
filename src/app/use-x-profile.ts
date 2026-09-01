@@ -18,14 +18,14 @@ export function useXProfile(submittedHandle: string | null) {
   useEffect(() => {
     if (!submittedHandle) return;
     const controller = new AbortController();
-    fetch(withBasePath(`/api/x-profile?u=${submittedHandle}`), { signal: controller.signal })
+    fetch(withBasePath(`/api/x-profile?u=${submittedHandle}&v=2`), { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
       .then((data: { name?: string | null; photo?: string | null } | null) => {
         if (!data) return;
         setProfile({
           name: data.name ?? undefined,
           photo: data.photo
-            ? withBasePath(`/api/x-avatar?u=${encodeURIComponent(submittedHandle)}`)
+            ? withBasePath(`/api/x-avatar?u=${encodeURIComponent(submittedHandle)}&v=2`)
             : undefined,
         });
       })

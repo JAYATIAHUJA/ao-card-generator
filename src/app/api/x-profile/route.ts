@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 
-export const dynamic = "force-static";
-
 /**
  * Best-effort X profile lookup. Server-side so the browser never deals with
  * CORS or third-party flakiness; cached for an hour per handle.
