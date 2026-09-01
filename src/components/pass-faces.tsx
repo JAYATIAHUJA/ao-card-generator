@@ -112,6 +112,7 @@ export function PassFrontFace({
               <img
                 className={styles.photoImg}
                 src={photo}
+                crossOrigin="anonymous"
                 alt={`${identity}'s profile`}
                 onError={() => setPhotoFailed(true)}
               />

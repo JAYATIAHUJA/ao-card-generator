@@ -3,6 +3,7 @@ const ROUTE_PREFIX = "/hackathons/syndicate/pass";
 const AVATAR_FALLBACK_HOST = "unavatar.io";
 const shortCache = { cf: { cacheTtl: 300, cacheEverything: true } } as RequestInit;
 const longCache = { cf: { cacheTtl: 86400, cacheEverything: true } } as RequestInit;
+const bypassCache = { cf: { cacheTtl: 0 } } as RequestInit;
 
 function getHandle(url: URL) {
   const handle = url.searchParams.get("u") ?? "";
@@ -48,7 +49,7 @@ export default {
         const profile = await getXProfile(handle);
         profile.photo ??= getFallbackAvatarUrl(handle);
         return Response.json(profile, {
-          headers: { "cache-control": "public, max-age=3600" },
+          headers: { "cache-control": "public, max-age=300" },
         });
       } catch {
         return Response.json(
@@ -95,6 +96,17 @@ export default {
     upstreamUrl.pathname = url.pathname.slice(ROUTE_PREFIX.length) || "/";
 
     const upstreamRequest = new Request(upstreamUrl, request);
-    return fetch(upstreamRequest);
+    const response = await fetch(upstreamRequest, bypassCache);
+    if (!response.headers.get("content-type")?.includes("text/html")) {
+      return response;
+    }
+
+    const headers = new Headers(response.headers);
+    headers.set("cache-control", "no-store");
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   },
 };
