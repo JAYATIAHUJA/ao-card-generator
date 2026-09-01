@@ -154,7 +154,11 @@ export function usePassShare({
       const blob = await blobPromise;
       if (!blob) throw new Error("capture returned no image");
 
-      const message = `I'm attending Syndicate, @aoagents' online hackathon. Cash prizes are up for grabs, powered by @maximor_ai and supported by @dodopayments, @neatlogs, and @Tensormux. See you there! aoagents.dev`;
+      const message = [
+        `I'm attending Syndicate, @aoagents' online hackathon.`,
+        `Cash prizes are up for grabs, powered by @maximor_ai and supported by @dodopayments, @neatlogs, and @Tensormux.`,
+        `See you there!`,
+      ].join("\n\n");
 
       // Phones only: the native share sheet carries the image straight into
       // the X app, which the web intent URL cannot do. Desktop browsers
