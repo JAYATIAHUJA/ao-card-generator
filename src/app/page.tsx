@@ -186,7 +186,7 @@ export default function IntroPage() {
                     aria-label="Agent Orchestrator"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img className="size-5 translate-y-[1px]" src={withBasePath("/ao-logo.svg")} alt="" aria-hidden="true" />
+                    <img className="size-5 translate-y-[1px]" src={withBasePath("/favicon.svg")} alt="" aria-hidden="true" />
                     <span className="block text-[11px] font-medium leading-none tracking-[0.16em] text-white/50">
                       AO HACKATHON
                     </span>

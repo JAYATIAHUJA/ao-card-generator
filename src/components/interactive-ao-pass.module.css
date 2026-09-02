@@ -198,7 +198,7 @@
    under the presenter eyebrow. */
 .hackName {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   gap: 1.4cqw;
   margin: 0.4cqw 0 0;
   color: var(--ink-cream);
@@ -211,13 +211,37 @@
 }
 
 .hackYear {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1.3cqw;
   color: rgb(245 232 204 / 72%);
   font-family: inherit;
   font-size: clamp(12px, 2.4cqw, 22px);
   font-weight: inherit;
   letter-spacing: 0.01em;
-  transform: translateY(0.03em);
+  transform: translateY(0);
   white-space: nowrap;
+}
+
+.hackHostLogoFrame {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+  align-self: flex-end;
+  width: clamp(93px, 20.4cqw, 186px);
+  aspect-ratio: 838 / 168;
+  overflow: hidden;
+}
+
+.hackHostLogo {
+  position: absolute;
+  top: -50%;
+  left: -9.79%;
+  width: 117.39%;
+  height: auto;
+  max-width: none;
+  opacity: 1;
+  filter: none;
 }
 
 .identity,
@@ -352,7 +376,7 @@
   gap: 1.3cqw 2.4cqw;
   /* No margin of its own — the identity row's auto margins centre the block,
      which keeps the space above and below the photo even. */
-  margin-top: 0;
+  margin-top: 1.4cqw;
 }
 
 .sponsorLabel {
@@ -369,11 +393,6 @@
 .sponsorLogo {
   width: auto;
   filter: drop-shadow(0 1px 2px rgb(4 16 38 / 45%));
-}
-
-.sponsorLogoMaximor {
-  height: clamp(18px, 3.55cqw, 31px);
-  margin: -0.5cqw 0 -0.6cqw;
 }
 
 .sponsorLogoDodo {
@@ -424,8 +443,8 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 2cqw;
-  margin-top: 2cqw;
-  padding-top: 2.2cqw;
+  margin-top: 1.35cqw;
+  padding-top: 1.35cqw;
   border-top: 1px solid rgb(220 190 156 / 42%);
 }
 
@@ -672,7 +691,7 @@
   }
 
   .frontCopy {
-    padding-left: 5.5%;
+    padding-left: 6.2%;
   }
 
   .eyebrow,
@@ -692,6 +711,10 @@
 
   .hackYear {
     font-size: clamp(7px, 2.4cqw, 22px);
+  }
+
+  .hackHostLogoFrame {
+    width: clamp(52px, 20.4cqw, 186px);
   }
 
   .identity {
@@ -719,56 +742,52 @@
   }
 
   .photoFrame {
-    width: 21cqw;
+    width: 23cqw;
   }
 
   .frontCopy[data-with-photo="true"] .teamLine {
-    margin-left: calc(21cqw + 3.2cqw);
+    margin-left: calc(23cqw + 3.2cqw);
   }
 
   .teamLine {
     font-size: clamp(5px, 1.6cqw, 14px);
   }
 
-  /* The sponsor strip is the tightest row on the card, so it gets a shorter
-     label and slightly smaller marks to stay inside the perforation. */
+  /* Keep the desktop sponsor geometry; only the lower clamp bounds shrink. */
   .sponsorRow {
-    gap: 1.5cqw;
+    gap: 1.3cqw 2.4cqw;
+    margin-top: 1.4cqw;
   }
 
   .sponsorLabel {
-    font-size: clamp(6px, 1.8cqw, 12px);
-    letter-spacing: 0.1em;
+    font-size: clamp(4px, 1.4cqw, 12px);
+    letter-spacing: 0.18em;
   }
 
   .sponsorLogo {
-    max-width: 23cqw;
-  }
-
-  .sponsorLogoMaximor {
-    height: clamp(10px, 3.05cqw, 31px);
-    margin: -0.4cqw 0 -0.5cqw;
+    max-width: none;
   }
 
   .sponsorLogoDodo {
-    height: clamp(7px, 2.2cqw, 22px);
+    height: clamp(7px, 2.55cqw, 22px);
   }
 
   .sponsorLogoNeatlogs {
-    height: clamp(8px, 2.65cqw, 26px);
+    height: clamp(8px, 3cqw, 26px);
   }
 
   .sponsorChip {
-    width: clamp(23px, 7.7cqw, 85px);
-    height: clamp(8px, 2.6cqw, 27px);
+    width: clamp(23px, 9.6cqw, 85px);
+    height: clamp(8px, 3.1cqw, 27px);
   }
 
   .sponsorChipAiGrants {
-    width: clamp(29px, 9.2cqw, 99px);
+    width: clamp(29px, 11.2cqw, 99px);
   }
 
   .frontFooter {
-    gap: 1.2cqw;
+    gap: 2cqw;
+    margin-top: 1.35cqw;
   }
 
   .passType {
@@ -797,13 +816,13 @@
   }
 
   .backDetails {
-    grid-template-columns: 1.3fr 1fr;
-    row-gap: 2.2cqw;
+    grid-template-columns: repeat(4, minmax(0, auto));
+    row-gap: normal;
   }
 
   .backMeta {
-    padding-left: 0;
-    border-left: 0;
+    padding-left: 3cqw;
+    border-left: 1px solid rgb(222 189 154 / 31%);
   }
 }
 
@@ -960,6 +979,143 @@
 .stage[data-capturing="true"],
 .stage[data-capturing="true"] .ticket {
   transform: none !important;
+}
+
+.stage[data-capturing="true"] {
+  width: 860px !important;
+}
+
+.stage[data-capturing="true"] .frontCopy {
+  padding-left: 6.2%;
+}
+
+.stage[data-capturing="true"] .eyebrow,
+.stage[data-capturing="true"] .detailLabel,
+.stage[data-capturing="true"] .dateLine,
+.stage[data-capturing="true"] .backMeta {
+  font-size: clamp(8px, 1.72cqw, 14px);
+}
+
+.stage[data-capturing="true"] .eyebrow {
+  font-size: clamp(11px, 2.3cqw, 20px);
+}
+
+.stage[data-capturing="true"] .hackName {
+  font-size: clamp(22px, 5.2cqw, 48px);
+}
+
+.stage[data-capturing="true"] .hackYear {
+  font-size: clamp(12px, 2.4cqw, 22px);
+}
+
+.stage[data-capturing="true"] .hackHostLogoFrame {
+  width: clamp(93px, 20.4cqw, 186px);
+}
+
+.stage[data-capturing="true"] .identity {
+  font-size: clamp(26px, 7.4cqw, 66px);
+}
+
+.stage[data-capturing="true"] .fromLine {
+  font-size: clamp(16px, 3.4cqw, 30px);
+}
+
+.stage[data-capturing="true"] .frontCopy[data-with-photo="true"] .identityRow {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.stage[data-capturing="true"] .frontCopy[data-with-photo="true"] .identity {
+  font-size: clamp(26px, 8.4cqw, 74px);
+}
+
+.stage[data-capturing="true"] .frontCopy[data-with-photo="true"] .identityRow[data-name-length="medium"] .identity {
+  font-size: clamp(22px, 6.4cqw, 56px);
+}
+
+.stage[data-capturing="true"] .frontCopy[data-with-photo="true"] .identityRow[data-name-length="long"] .identity {
+  font-size: clamp(18px, 4.8cqw, 42px);
+}
+
+.stage[data-capturing="true"] .frontCopy[data-with-photo="true"] .fromLine {
+  font-size: clamp(12px, 2.6cqw, 23px);
+}
+
+.stage[data-capturing="true"] .photoFrame {
+  width: 23cqw;
+}
+
+.stage[data-capturing="true"] .frontCopy[data-with-photo="true"] .teamLine {
+  margin-left: calc(23cqw + 3.2cqw);
+}
+
+.stage[data-capturing="true"] .teamLine {
+  font-size: clamp(9px, 1.6cqw, 14px);
+}
+
+.stage[data-capturing="true"] .sponsorRow {
+  gap: 1.3cqw 2.4cqw;
+  margin-top: 1.4cqw;
+}
+
+.stage[data-capturing="true"] .sponsorLabel {
+  font-size: clamp(7px, 1.4cqw, 12px);
+  letter-spacing: 0.18em;
+}
+
+.stage[data-capturing="true"] .sponsorLogo {
+  max-width: none;
+}
+
+.stage[data-capturing="true"] .sponsorLogoDodo {
+  height: clamp(12px, 2.55cqw, 22px);
+}
+
+.stage[data-capturing="true"] .sponsorLogoNeatlogs {
+  height: clamp(15px, 3cqw, 26px);
+}
+
+.stage[data-capturing="true"] .sponsorChip {
+  width: clamp(58px, 9.6cqw, 85px);
+  height: clamp(18px, 3.1cqw, 27px);
+}
+
+.stage[data-capturing="true"] .frontFooter {
+  gap: 2cqw;
+  margin-top: 1.35cqw;
+}
+
+.stage[data-capturing="true"] .passType {
+  font-size: clamp(13px, 3.1cqw, 27px);
+}
+
+.stage[data-capturing="true"] .dateLine {
+  font-size: clamp(10px, 2.1cqw, 18px);
+}
+
+.stage[data-capturing="true"] .stubText {
+  font-size: clamp(22px, 5.4cqw, 48px);
+}
+
+.stage[data-capturing="true"] .stubYear {
+  font-size: clamp(48px, 13.5cqw, 118px);
+}
+
+.stage[data-capturing="true"] .mission {
+  font-size: clamp(28px, 6.4cqw, 96px);
+}
+
+.stage[data-capturing="true"] .detailValue {
+  font-size: clamp(10px, 2.35cqw, 20px);
+}
+
+.stage[data-capturing="true"] .backDetails {
+  grid-template-columns: repeat(4, minmax(0, auto));
+  row-gap: normal;
+}
+
+.stage[data-capturing="true"] .backMeta {
+  padding-left: 3cqw;
+  border-left: 1px solid rgb(222 189 154 / 31%);
 }
 
 .stage[data-capturing="true"] .back {

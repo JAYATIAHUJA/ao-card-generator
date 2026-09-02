@@ -96,7 +96,17 @@ export function PassFrontFace({
           <p className={styles.eyebrow}>AO HACKATHON</p>
           <p className={styles.hackName}>
             {eventName.toUpperCase()}
-            <span className={styles.hackYear}>· BY MAXIMOR</span>
+            <span className={styles.hackYear}>
+              · BY
+              <span className={styles.hackHostLogoFrame}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className={styles.hackHostLogo}
+                  src={withBasePath("/sponsors/maximor.svg")}
+                  alt="Maximor"
+                />
+              </span>
+            </span>
           </p>
         </div>
         <div
@@ -130,8 +140,6 @@ export function PassFrontFace({
             aria-label on a generic div would not be exposed anyway. */}
         <div className={styles.sponsorRow}>
           <span className={styles.sponsorLabel}>SPONSORED BY</span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoMaximor}`} src={withBasePath("/sponsors/maximor.svg")} alt="Maximor" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className={`${styles.sponsorLogo} ${styles.sponsorLogoDodo}`} src={withBasePath("/sponsors/dodo-payments-dark.webp")} alt="Dodo Payments" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
