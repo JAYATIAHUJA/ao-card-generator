@@ -13,10 +13,15 @@ export interface XProfile {
  */
 export function useXProfile(submittedHandle: string | null) {
   const [profile, setProfile] = useState<XProfile>({});
+  const [profileReady, setProfileReady] = useState(true);
 
   useEffect(() => {
-    if (!submittedHandle) return;
+    if (!submittedHandle) {
+      setProfileReady(true);
+      return;
+    }
     const controller = new AbortController();
+    setProfileReady(false);
     fetch(`https://api.fxtwitter.com/${submittedHandle}`, { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
       .then((data: { user?: { name?: string | null; avatar_url?: string | null } } | null) => {
@@ -29,9 +34,12 @@ export function useXProfile(submittedHandle: string | null) {
       })
       .catch(() => {
         // Profile lookup is best-effort; the pass falls back to the handle.
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setProfileReady(true);
       });
     return () => controller.abort();
   }, [submittedHandle]);
 
-  return { profile, resetProfile: () => setProfile({}) };
+  return { profile, profileReady, resetProfile: () => setProfile({}) };
 }

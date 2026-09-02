@@ -19,6 +19,7 @@ export interface InteractiveAOPassProps {
   eventName?: string;
   date?: string;
   format?: string;
+  captureReady?: boolean;
 }
 
 export function InteractiveAOPass({
@@ -31,6 +32,7 @@ export function InteractiveAOPass({
   eventName = "Syndicate",
   date = "Sep 5 - 7",
   format = "Online",
+  captureReady = true,
 }: InteractiveAOPassProps) {
   const [flipped, setFlipped] = useState(false);
   const username = normalizeXUsername(xUsername);
@@ -75,6 +77,7 @@ export function InteractiveAOPass({
   const autoCopyRef = useRef(autoCopy);
   autoCopyRef.current = autoCopy;
   useEffect(() => {
+    if (!captureReady) return;
     let cancelled = false;
     setAutoCopyFailed(false);
     const timeout = window.setTimeout(() => {
@@ -86,7 +89,7 @@ export function InteractiveAOPass({
       cancelled = true;
       window.clearTimeout(timeout);
     };
-  }, [identityKey]);
+  }, [captureReady, identityKey]);
 
   const shader = {
     interactionX,
@@ -154,7 +157,7 @@ export function InteractiveAOPass({
           type="button"
           className={styles.shareButton}
           onClick={shareCard}
-          disabled={shareState === "working"}
+          disabled={!captureReady || shareState === "working"}
         >
           {shareLabels[shareState]}
         </button>
@@ -162,7 +165,7 @@ export function InteractiveAOPass({
           type="button"
           className={styles.shareButton}
           onClick={downloadCard}
-          disabled={shareState === "working"}
+          disabled={!captureReady || shareState === "working"}
         >
           DOWNLOAD PASS
         </button>

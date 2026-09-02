@@ -1,7 +1,7 @@
 "use client";
 
 import { type MotionValue } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { withBasePath } from "../lib/base-path";
 import styles from "./interactive-ao-pass.module.css";
 import { PaperShader } from "./PaperShader";
@@ -80,7 +80,14 @@ export function PassFrontFace({
   format,
 }: PassFrontFaceProps) {
   const [photoFailed, setPhotoFailed] = useState(false);
-  const showPhoto = Boolean(photo) && !photoFailed;
+  const [photoLoaded, setPhotoLoaded] = useState(false);
+  const showPhoto = Boolean(photo);
+  const photoInitials = identity.trim().slice(0, 2).toUpperCase() || "AO";
+
+  useEffect(() => {
+    setPhotoFailed(false);
+    setPhotoLoaded(false);
+  }, [photo]);
 
   return (
     <section
@@ -117,15 +124,22 @@ export function PassFrontFace({
         >
           {showPhoto ? (
             <span className={styles.photoFrame}>
+              <span className={styles.photoFallback} aria-hidden="true">
+                {photoInitials}
+              </span>
               {/* A plain image keeps the component compatible with attendee image URLs. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className={styles.photoImg}
-                src={photo}
-                crossOrigin="anonymous"
-                alt={`${identity}'s profile`}
-                onError={() => setPhotoFailed(true)}
-              />
+              {!photoFailed ? (
+                <img
+                  className={styles.photoImg}
+                  src={photo}
+                  crossOrigin="anonymous"
+                  alt={`${identity}'s profile`}
+                  data-loaded={photoLoaded ? "true" : "false"}
+                  onLoad={() => setPhotoLoaded(true)}
+                  onError={() => setPhotoFailed(true)}
+                />
+              ) : null}
             </span>
           ) : null}
           <div className={styles.identityBlock}>

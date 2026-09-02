@@ -35,7 +35,7 @@ const normalizeHandleInput = (value: string) => {
 export default function IntroPage() {
   const [handle, setHandle] = useState("");
   const [submittedHandle, setSubmittedHandle] = useState<string | null>(null);
-  const { profile, resetProfile } = useXProfile(submittedHandle);
+  const { profile, profileReady, resetProfile } = useXProfile(submittedHandle);
   const validHandle =
     /^[A-Za-z0-9_]{5,15}$/.test(handle) &&
     !handle.toLowerCase().includes("admin");
@@ -80,6 +80,7 @@ export default function IntroPage() {
                 xUsername={submittedHandle}
                 name={profile.name}
                 photo={profile.photo}
+                captureReady={profileReady}
               />
             </motion.section>
           ) : (

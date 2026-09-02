@@ -276,6 +276,24 @@
   box-shadow: 0 3px 14px rgb(4 16 38 / 50%);
 }
 
+.photoFallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  color: rgb(245 232 204 / 82%);
+  background:
+    radial-gradient(circle at 32% 24%, rgb(214 238 255 / 18%), transparent 46%),
+    linear-gradient(135deg, rgb(20 55 78 / 94%), rgb(9 24 39 / 96%));
+  font-family: var(--font-geist-pixel-square), var(--font-geist-sans), sans-serif;
+  font-size: clamp(18px, 5.6cqw, 48px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
 /* The avatar keeps its own colours. Only element-local filters are used — a
    mix-blend-mode tint would not survive the export capture, which reproduces
    neither the shader canvas nor blend modes, so the photo would look one way
@@ -288,6 +306,14 @@
   object-fit: cover;
   object-position: 50% 30%;
   filter: saturate(1.04) contrast(1.03);
+  opacity: 1;
+}
+
+.photoImg[data-loaded="false"] {
+  opacity: 0;
+}
+
+.photoImg[data-loaded="true"] {
   opacity: 1;
 }
 

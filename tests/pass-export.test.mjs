@@ -9,6 +9,59 @@ import { dirname, join } from "node:path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const { downloadBlob } = passExport;
 
+test("capture readiness waits for active paper shaders", async () => {
+  const previousDocument = globalThis.document;
+  const previousRaf = globalThis.requestAnimationFrame;
+  let frameCount = 0;
+  const shader = { dataset: { active: "true", ready: "false" } };
+  const root = {
+    querySelectorAll(selector) {
+      return selector === '[data-testid="paper-shader"]' ? [shader] : [];
+    },
+  };
+
+  globalThis.document = { fonts: { ready: Promise.resolve() } };
+  globalThis.requestAnimationFrame = (callback) => {
+    frameCount += 1;
+    if (frameCount === 2) shader.dataset.ready = "true";
+    callback(performance.now());
+    return frameCount;
+  };
+
+  try {
+    await passExport.waitForCardReadiness(root, { timeoutMs: 1000 });
+    assert.equal(frameCount, 3);
+  } finally {
+    globalThis.document = previousDocument;
+    globalThis.requestAnimationFrame = previousRaf;
+  }
+});
+
+test("capture readiness times out instead of hanging on missing shaders", async () => {
+  const previousDocument = globalThis.document;
+  const previousRaf = globalThis.requestAnimationFrame;
+  const shader = { dataset: { active: "true", ready: "false" } };
+  const root = {
+    querySelectorAll(selector) {
+      return selector === '[data-testid="paper-shader"]' ? [shader] : [];
+    },
+  };
+
+  globalThis.document = { fonts: { ready: Promise.resolve() } };
+  globalThis.requestAnimationFrame = (callback) => {
+    setTimeout(() => callback(performance.now()), 1);
+    return 1;
+  };
+
+  try {
+    await passExport.waitForCardReadiness(root, { timeoutMs: 0 });
+    assert.equal(shader.dataset.ready, "false");
+  } finally {
+    globalThis.document = previousDocument;
+    globalThis.requestAnimationFrame = previousRaf;
+  }
+});
+
 test("capture preparation does not resize the visible mobile stage", () => {
   const appended = [];
   const attributes = {};
@@ -144,6 +197,24 @@ test("Maximor is the host logo, not a repeated sponsor logo", () => {
   assert.match(css, /\.hackHostLogo\s*\{[\s\S]*?position:\s*absolute/);
   assert.match(css, /opacity:\s*1/);
   assert.doesNotMatch(css, /\.sponsorLogoMaximor/);
+});
+
+test("profile photos have an initials fallback for failed image loads", () => {
+  const faceMarkup = readFileSync(
+    join(__dirname, "../src/components/pass-faces.tsx"),
+    "utf8",
+  );
+  const css = readFileSync(
+    join(__dirname, "../src/components/interactive-ao-pass.module.css"),
+    "utf8",
+  );
+
+  assert.match(faceMarkup, /className=\{styles\.photoFallback\}/);
+  assert.match(faceMarkup, /aria-hidden="true"/);
+  assert.match(faceMarkup, /onLoad=\{\(\) => setPhotoLoaded\(true\)\}/);
+  assert.match(css, /\.photoFallback\s*\{/);
+  assert.match(css, /\.photoImg\[data-loaded="false"\]/);
+  assert.match(css, /\.photoImg\[data-loaded="true"\]/);
 });
 
 test("sponsor row stays close above the footer divider on export", () => {

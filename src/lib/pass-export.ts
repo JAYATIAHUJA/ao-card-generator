@@ -25,6 +25,42 @@ async function waitForImages(root: HTMLElement) {
   );
 }
 
+function nextFrame() {
+  return new Promise((resolve) => requestAnimationFrame(resolve));
+}
+
+async function waitForPaperShaders(
+  root: HTMLElement,
+  options: { timeoutMs: number },
+) {
+  const startedAt = performance.now();
+
+  while (performance.now() - startedAt <= options.timeoutMs) {
+    const shaders = Array.from(
+      root.querySelectorAll<HTMLElement>('[data-testid="paper-shader"]'),
+    ).filter((shader) => shader.dataset.active !== "false");
+
+    if (
+      shaders.length === 0 ||
+      shaders.every((shader) => shader.dataset.ready === "true")
+    ) {
+      return;
+    }
+
+    await nextFrame();
+  }
+}
+
+export async function waitForCardReadiness(
+  root: HTMLElement,
+  options: { timeoutMs?: number } = {},
+) {
+  await document.fonts.ready;
+  await waitForImages(root);
+  await waitForPaperShaders(root, { timeoutMs: options.timeoutMs ?? 2500 });
+  await nextFrame();
+}
+
 // Embedding the webfonts is the slowest part of a capture (html-to-image
 // re-fetches and inlines every font file each time); the result is static per
 // page load, so it is computed once and reused.
@@ -105,13 +141,13 @@ export function createCaptureTarget(stage: HTMLElement): HTMLElement {
 export async function captureLiveCard(
   stage: HTMLElement,
 ): Promise<Blob | null> {
-  await document.fonts.ready;
-  await waitForImages(stage);
+  await waitForCardReadiness(stage);
   const captureTarget = createCaptureTarget(stage);
   try {
     await waitForImages(captureTarget);
     // Let the connected clone resolve its desktop capture styles.
-    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await nextFrame();
+    copyCanvasFrames(stage, captureTarget);
     return await snapshot(captureTarget, {
       pixelRatio:
         CARD_TARGET_WIDTH / Math.max(1, captureTarget.offsetWidth),
