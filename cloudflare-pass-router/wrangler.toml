@@ -1,0 +1,8 @@
+name = "ao-syndicate-pass-router"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+account_id = "ed364bdf90d5a988f50a0650eddc2742"
+
+routes = [
+  { pattern = "aoagents.dev/hackathons/syndicate/pass*", zone_name = "aoagents.dev" }
+]

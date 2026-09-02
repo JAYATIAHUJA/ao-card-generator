@@ -13,26 +13,33 @@ export interface XProfile {
  */
 export function useXProfile(submittedHandle: string | null) {
   const [profile, setProfile] = useState<XProfile>({});
+  const [profileReady, setProfileReady] = useState(true);
 
   useEffect(() => {
-    if (!submittedHandle) return;
+    if (!submittedHandle) {
+      setProfileReady(true);
+      return;
+    }
     const controller = new AbortController();
-    fetch(`/api/x-profile?u=${submittedHandle}`, { signal: controller.signal })
+    setProfileReady(false);
+    fetch(`https://api.fxtwitter.com/${submittedHandle}`, { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
-      .then((data: { name?: string | null; photo?: string | null } | null) => {
+      .then((data: { user?: { name?: string | null; avatar_url?: string | null } } | null) => {
         if (!data) return;
+        const avatar = data.user?.avatar_url?.replace("_normal", "_400x400");
         setProfile({
-          name: data.name ?? undefined,
-          photo: data.photo
-            ? `/api/x-avatar?u=${encodeURIComponent(submittedHandle)}`
-            : undefined,
+          name: data.user?.name ?? undefined,
+          photo: avatar ?? undefined,
         });
       })
       .catch(() => {
         // Profile lookup is best-effort; the pass falls back to the handle.
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setProfileReady(true);
       });
     return () => controller.abort();
   }, [submittedHandle]);
 
-  return { profile, resetProfile: () => setProfile({}) };
+  return { profile, profileReady, resetProfile: () => setProfile({}) };
 }

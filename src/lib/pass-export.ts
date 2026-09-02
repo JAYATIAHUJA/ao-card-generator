@@ -1,7 +1,6 @@
-// Client-only capture pipeline for the share/download PNG. The card is
-// captured from the LIVE, on-screen stage (so the PNG shows exactly what the
-// user sees — current shader frame, light and foil included) and composited
-// over a hidden, pre-rendered backdrop (base color + waves + overlay).
+// Client-only capture pipeline for the share/download PNG. A clone of the
+// live stage is captured offscreen so export sizing never reflows the visible
+// mobile page. Its current canvas frame is retained for the exported card.
 
 export const EXPORT_WIDTH = 1600;
 export const EXPORT_HEIGHT = 900;
@@ -26,23 +25,66 @@ async function waitForImages(root: HTMLElement) {
   );
 }
 
+function nextFrame() {
+  return new Promise((resolve) => requestAnimationFrame(resolve));
+}
+
+async function waitForPaperShaders(
+  root: HTMLElement,
+  options: { timeoutMs: number },
+) {
+  const startedAt = performance.now();
+
+  while (performance.now() - startedAt <= options.timeoutMs) {
+    const shaders = Array.from(
+      root.querySelectorAll<HTMLElement>('[data-testid="paper-shader"]'),
+    ).filter((shader) => shader.dataset.active !== "false");
+
+    if (
+      shaders.length === 0 ||
+      shaders.every((shader) => shader.dataset.ready === "true")
+    ) {
+      return;
+    }
+
+    await nextFrame();
+  }
+}
+
+export async function waitForCardReadiness(
+  root: HTMLElement,
+  options: { timeoutMs?: number } = {},
+) {
+  await document.fonts.ready;
+  await waitForImages(root);
+  await waitForPaperShaders(root, { timeoutMs: options.timeoutMs ?? 2500 });
+  await nextFrame();
+}
+
+// Embedding the webfonts is the slowest part of a capture (html-to-image
+// re-fetches and inlines every font file each time); the result is static per
+// page load, so it is computed once and reused.
+let fontCssPromise: Promise<string | undefined> | null = null;
+
+function getFontCss(root: HTMLElement) {
+  if (!fontCssPromise) {
+    fontCssPromise = import("html-to-image")
+      .then(({ getFontEmbedCSS }) => getFontEmbedCSS(root))
+      .catch(() => undefined);
+  }
+  return fontCssPromise;
+}
+
 async function snapshot(
   root: HTMLElement,
-  options: { pixelRatio: number; pinToOrigin?: boolean },
+  options: { pixelRatio: number },
 ): Promise<Blob | null> {
   const { toBlob } = await import("html-to-image");
-  // The backdrop is parked offscreen with `position: fixed; left: -10000px`,
-  // and html-to-image inlines computed styles onto the clone — including that
-  // offset, expressed via the `inset-inline` shorthand, which would paint the
-  // whole composition outside the frame. `inset` resets the whole family.
-  const style = options.pinToOrigin
-    ? { position: "relative", inset: "0px", right: "auto", bottom: "auto" }
-    : undefined;
+  const fontEmbedCSS = await getFontCss(root);
   let blob = await toBlob(root, {
     pixelRatio: options.pixelRatio,
-    cacheBust: true,
     imagePlaceholder: transparentPixel,
-    style,
+    fontEmbedCSS,
   }).catch((error) => {
     console.error("[export] capture failed, retrying without images", error);
     return null;
@@ -52,72 +94,126 @@ async function snapshot(
     blob = await toBlob(root, {
       pixelRatio: options.pixelRatio,
       filter: (node) => (node as HTMLElement).tagName !== "IMG",
-      style,
+      fontEmbedCSS,
     }).catch(() => null);
   }
   return blob;
 }
 
+function copyCanvasFrames(source: HTMLElement, target: HTMLElement) {
+  const sourceCanvases = Array.from(source.querySelectorAll("canvas"));
+  const targetCanvases = Array.from(target.querySelectorAll("canvas"));
+
+  sourceCanvases.forEach((sourceCanvas, index) => {
+    const targetCanvas = targetCanvases[index];
+    if (!targetCanvas) return;
+
+    targetCanvas.width = sourceCanvas.width;
+    targetCanvas.height = sourceCanvas.height;
+    try {
+      targetCanvas.getContext("2d")?.drawImage(sourceCanvas, 0, 0);
+    } catch {
+      // Keep the cloned canvas transparent if its source cannot be read.
+    }
+  });
+}
+
+/** Creates a connected export clone without resizing the visible stage. */
+export function createCaptureTarget(stage: HTMLElement): HTMLElement {
+  const captureTarget = stage.cloneNode(true) as HTMLElement;
+  captureTarget.dataset.capturing = "true";
+  captureTarget.setAttribute("aria-hidden", "true");
+  Object.assign(captureTarget.style, {
+    position: "fixed",
+    top: "0",
+    left: "-10000px",
+    pointerEvents: "none",
+  });
+  stage.ownerDocument.body.appendChild(captureTarget);
+  copyCanvasFrames(stage, captureTarget);
+  return captureTarget;
+}
+
 /**
- * Captures the live card as it currently appears. The `data-capturing` CSS
- * pins the stage flat on its front face with `!important` transforms while
- * the snapshot runs, so no animation state has to be reset or restored.
+ * Captures an offscreen clone. Capture-only desktop styles never touch the
+ * visible mobile stage, while the exported card keeps its desktop geometry.
  */
 export async function captureLiveCard(
   stage: HTMLElement,
 ): Promise<Blob | null> {
-  await document.fonts.ready;
-  await waitForImages(stage);
-  stage.dataset.capturing = "true";
+  await waitForCardReadiness(stage);
+  const captureTarget = createCaptureTarget(stage);
   try {
-    // Let the pinning styles apply before cloning.
-    await new Promise((resolve) => requestAnimationFrame(resolve));
-    return await snapshot(stage, {
-      pixelRatio: CARD_TARGET_WIDTH / Math.max(1, stage.offsetWidth),
+    await waitForImages(captureTarget);
+    // Let the connected clone resolve its desktop capture styles.
+    await nextFrame();
+    copyCanvasFrames(stage, captureTarget);
+    return await snapshot(captureTarget, {
+      pixelRatio:
+        CARD_TARGET_WIDTH / Math.max(1, captureTarget.offsetWidth),
     });
   } finally {
-    delete stage.dataset.capturing;
+    captureTarget.remove();
   }
 }
 
-let backdropPromise: Promise<Blob | null> | null = null;
+let wavesCanvas: HTMLCanvasElement | null | undefined;
 
-/** The backdrop is static, so it is captured at most once per page load. */
-export function captureBackdrop(root: HTMLElement): Promise<Blob | null> {
-  if (!backdropPromise) {
-    backdropPromise = (async () => {
-      await document.fonts.ready;
-      await waitForImages(root);
-      await new Promise((resolve) => requestAnimationFrame(resolve));
-      return snapshot(root, { pixelRatio: 1, pinToOrigin: true });
-    })();
+/**
+ * Draws the page backdrop (black base, dot-grid waves, darkening overlay)
+ * straight onto the export context — a canvas re-creation of the page's
+ * fixed background layers in their "pass shown" state.
+ */
+async function drawBackdrop(context: CanvasRenderingContext2D) {
+  context.fillStyle = "#000000";
+  context.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
+
+  if (wavesCanvas === undefined) {
+    // Dynamic so importing this module stays side-effect free outside the
+    // browser (the waves module re-renders a WebGL frame of the background).
+    const { renderWavesBackgroundCanvas } = await import("./waves-background");
+    wavesCanvas = renderWavesBackgroundCanvas(EXPORT_WIDTH, EXPORT_HEIGHT);
   }
-  return backdropPromise;
+  if (wavesCanvas) {
+    context.globalAlpha = 0.15;
+    context.drawImage(wavesCanvas, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
+    context.globalAlpha = 1;
+  }
+
+  // Page overlay at its "pass shown" opacity (0.35), pre-multiplied into the
+  // stop colors: radial warm vignette + top-to-bottom darkening.
+  const cx = EXPORT_WIDTH * 0.5;
+  const cy = EXPORT_HEIGHT * 0.42;
+  const farthestCorner = Math.hypot(cx, EXPORT_HEIGHT - cy);
+  const radial = context.createRadialGradient(
+    cx,
+    cy,
+    0,
+    cx,
+    cy,
+    farthestCorner * 0.46,
+  );
+  radial.addColorStop(0, "rgba(112, 37, 31, 0.063)");
+  radial.addColorStop(1, "rgba(112, 37, 31, 0)");
+  context.fillStyle = radial;
+  context.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
+
+  const linear = context.createLinearGradient(0, 0, 0, EXPORT_HEIGHT);
+  linear.addColorStop(0, "rgba(0, 0, 0, 0.042)");
+  linear.addColorStop(1, "rgba(0, 0, 0, 0.266)");
+  context.fillStyle = linear;
+  context.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
 }
 
 /** Draws backdrop + centered live-card capture onto the export canvas. */
-export async function composePassPng(
-  backdrop: Blob | null,
-  card: Blob,
-): Promise<Blob | null> {
+export async function composePassPng(card: Blob): Promise<Blob | null> {
   const canvas = document.createElement("canvas");
   canvas.width = EXPORT_WIDTH;
   canvas.height = EXPORT_HEIGHT;
   const context = canvas.getContext("2d");
   if (!context) return null;
 
-  if (backdrop) {
-    context.drawImage(
-      await createImageBitmap(backdrop),
-      0,
-      0,
-      EXPORT_WIDTH,
-      EXPORT_HEIGHT,
-    );
-  } else {
-    context.fillStyle = "#130b09";
-    context.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
-  }
+  await drawBackdrop(context);
 
   const cardImage = await createImageBitmap(card);
   context.drawImage(
@@ -133,7 +229,7 @@ export function downloadBlob(blob: Blob, username: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `orchestra-pass-${username.replace(/^@/, "")}.png`;
+  link.download = `syndicate-pass-${username.replace(/^@/, "")}.png`;
   link.click();
   URL.revokeObjectURL(url);
 }

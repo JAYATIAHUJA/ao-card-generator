@@ -21,16 +21,16 @@ function compileShader(
 
 /**
  * Renders one static frame of the ChromaticWaves dot grid into an offscreen
- * canvas and returns it as a PNG data URL. The live background canvas cannot
- * be read back (no preserveDrawingBuffer), so the share export re-renders the
- * same shader at the export size instead. Returns null when WebGL2 is
- * unavailable — the export scene then falls back to its CSS gradients alone.
+ * canvas. The live background canvas cannot be read back (no
+ * preserveDrawingBuffer), so the share export re-renders the same shader at
+ * the export size instead. Returns null when WebGL2 is unavailable — the
+ * export backdrop then falls back to its plain gradients alone.
  */
-export function renderWavesBackgroundDataUrl(
+export function renderWavesBackgroundCanvas(
   width: number,
   height: number,
   time = 4.2,
-): string | null {
+): HTMLCanvasElement | null {
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -83,11 +83,20 @@ export function renderWavesBackgroundDataUrl(
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-  const dataUrl = canvas.toDataURL("image/png");
+  // Copy the frame onto a plain 2D canvas and let the WebGL one go. Returning
+  // the live WebGL canvas would pin its context for the page's lifetime, and a
+  // context loss would silently blank the export backdrop; a 2D snapshot holds
+  // the pixels outright.
+  const snapshot = document.createElement("canvas");
+  snapshot.width = width;
+  snapshot.height = height;
+  const context = snapshot.getContext("2d");
+  if (context) context.drawImage(canvas, 0, 0);
 
   gl.deleteBuffer(buffer);
   gl.deleteProgram(program);
   gl.deleteShader(vertexShader);
   gl.deleteShader(fragmentShader);
-  return dataUrl;
+  gl.getExtension("WEBGL_lose_context")?.loseContext();
+  return context ? snapshot : null;
 }

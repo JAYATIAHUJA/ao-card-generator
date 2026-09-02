@@ -1,7 +1,8 @@
 "use client";
 
 import { type MotionValue } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { withBasePath } from "../lib/base-path";
 import styles from "./interactive-ao-pass.module.css";
 import { PaperShader } from "./PaperShader";
 
@@ -31,6 +32,7 @@ function ShaderLayer({
 function PassStub() {
   return (
     <aside className={styles.stub}>
+      <span className={styles.stubBarcode} aria-hidden="true" />
       <span className={styles.stubYear} aria-hidden="true">
         2026
       </span>
@@ -78,7 +80,14 @@ export function PassFrontFace({
   format,
 }: PassFrontFaceProps) {
   const [photoFailed, setPhotoFailed] = useState(false);
-  const showPhoto = Boolean(photo) && !photoFailed;
+  const [photoLoaded, setPhotoLoaded] = useState(false);
+  const showPhoto = Boolean(photo);
+  const photoInitials = identity.trim().slice(0, 2).toUpperCase() || "AO";
+
+  useEffect(() => {
+    setPhotoFailed(false);
+    setPhotoLoaded(false);
+  }, [photo]);
 
   return (
     <section
@@ -88,29 +97,49 @@ export function PassFrontFace({
     >
       <ShaderLayer {...shader} />
       <span className={styles.logoField} aria-hidden="true" />
+      <span className={styles.shineSweep} aria-hidden="true" />
       <div className={styles.frontCopy} data-with-photo={showPhoto ? "true" : "false"}>
         <div className={styles.eyebrowGroup}>
-          <p className={styles.eyebrow}>AGENT ORCHESTRATOR PRESENTS</p>
-          <p className={styles.eyebrow}>{eventName.toUpperCase()} · 2026</p>
+          <p className={styles.eyebrow}>AO HACKATHON</p>
+          <p className={styles.hackName}>
+            {eventName.toUpperCase()}
+            <span className={styles.hackYear}>
+              · BY
+              <span className={styles.hackHostLogoFrame}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className={styles.hackHostLogo}
+                  src={withBasePath("/sponsors/maximor.svg")}
+                  alt="Maximor"
+                />
+              </span>
+            </span>
+          </p>
         </div>
         <div
           className={styles.identityRow}
-          data-name-length={identity.length > 14 ? "long" : "short"}
+          data-name-length={
+            identity.length > 14 ? "long" : identity.length > 8 ? "medium" : "short"
+          }
         >
           {showPhoto ? (
             <span className={styles.photoFrame}>
+              <span className={styles.photoFallback} aria-hidden="true">
+                {photoInitials}
+              </span>
               {/* A plain image keeps the component compatible with attendee image URLs. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className={styles.photoImg}
-                src={photo}
-                alt={`${identity}'s profile`}
-                onError={() => setPhotoFailed(true)}
-              />
-              <span className={styles.photoShader} aria-hidden="true">
-                <ShaderLayer {...shader} />
-              </span>
-              <span className={styles.photoGrain} aria-hidden="true" />
+              {!photoFailed ? (
+                <img
+                  className={styles.photoImg}
+                  src={photo}
+                  crossOrigin="anonymous"
+                  alt={`${identity}'s profile`}
+                  data-loaded={photoLoaded ? "true" : "false"}
+                  onLoad={() => setPhotoLoaded(true)}
+                  onError={() => setPhotoFailed(true)}
+                />
+              ) : null}
             </span>
           ) : null}
           <div className={styles.identityBlock}>
@@ -121,8 +150,22 @@ export function PassFrontFace({
         {teamName?.trim() ? (
           <p className={styles.teamLine}>TEAM {teamName.trim().toUpperCase()}</p>
         ) : null}
-        <div className={styles.frontTag}>
-          <p className={styles.tagline}>BUILD · BREAK · SHIP · REPEAT</p>
+        {/* The visible sponsors/partners label names this group; a bare
+            aria-label on a generic div would not be exposed anyway. */}
+        <div className={styles.sponsorRow}>
+          <span className={styles.sponsorLabel}>SPONSORED BY</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoDodo}`} src={withBasePath("/sponsors/dodo-payments-dark.webp")} alt="Dodo Payments" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={`${styles.sponsorLogo} ${styles.sponsorLogoNeatlogs}`} src={withBasePath("/sponsors/neatlogs-lockup.svg")} alt="Neatlogs" />
+          <span className={styles.sponsorChip}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className={styles.sponsorChipLogo} src={withBasePath("/sponsors/tensormux.png")} alt="TensorMux" />
+          </span>
+          <span className={`${styles.sponsorChip} ${styles.sponsorChipAiGrants}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className={`${styles.sponsorChipLogo} ${styles.sponsorChipLogoAiGrants}`} src={withBasePath("/sponsors/ai-grants-india.svg")} alt="AI Grants India" />
+          </span>
         </div>
         <div className={styles.frontFooter}>
           <p className={styles.passType}>{passType.toUpperCase()}</p>
