@@ -194,7 +194,7 @@ export default function IntroPage() {
                   <p className="mt-7 text-[11px] font-medium tracking-[0.22em] text-white/40">
                     SPONSORED BY
                   </p>
-                  <div className="mx-auto mt-4 grid w-full max-w-[320px] grid-cols-2 items-center gap-x-8 gap-y-4 sm:max-w-[640px] sm:grid-cols-[1.25fr_1fr_1fr_1fr] sm:gap-6">
+                  <div className="mx-auto mt-4 grid w-full max-w-[320px] grid-cols-2 items-center gap-x-8 gap-y-4 sm:max-w-[760px] sm:grid-cols-[1.25fr_1fr_1fr_1fr_1fr] sm:gap-6">
                     <a
                       className="grid h-8 min-w-0 place-items-center opacity-90 transition-opacity hover:opacity-100 sm:h-10"
                       href="https://maximor.ai"
@@ -236,6 +236,16 @@ export default function IntroPage() {
                           instead of being cropped on narrow screens. */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img className="absolute top-1/2 left-1/2 w-[105%] max-w-none -translate-x-1/2 -translate-y-1/2" src={withBasePath("/sponsors/tensormux.png")} alt="TensorMux" />
+                    </a>
+                    <a
+                      className="relative col-span-2 mx-auto h-8 w-full max-w-[138px] overflow-hidden rounded-sm bg-white opacity-75 transition-opacity hover:opacity-100 sm:col-span-1 sm:h-9 sm:max-w-[150px]"
+                      href="https://aigrants.in/"
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="AI Grants India"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img className="absolute top-1/2 left-1/2 w-[92%] max-w-none -translate-x-1/2 -translate-y-1/2" src={withBasePath("/sponsors/ai-grants-india.svg")} alt="AI Grants India" />
                     </a>
                   </div>
                 </motion.div>

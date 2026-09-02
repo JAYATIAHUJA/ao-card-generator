@@ -140,6 +140,10 @@ export function PassFrontFace({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className={styles.sponsorChipLogo} src={withBasePath("/sponsors/tensormux.png")} alt="TensorMux" />
           </span>
+          <span className={`${styles.sponsorChip} ${styles.sponsorChipAiGrants}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className={`${styles.sponsorChipLogo} ${styles.sponsorChipLogoAiGrants}`} src={withBasePath("/sponsors/ai-grants-india.svg")} alt="AI Grants India" />
+          </span>
         </div>
         <div className={styles.frontFooter}>
           <p className={styles.passType}>{passType.toUpperCase()}</p>

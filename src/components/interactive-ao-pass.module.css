@@ -411,6 +411,14 @@
   transform: translate(-50%, -50%);
 }
 
+.sponsorChipAiGrants {
+  width: clamp(68px, 11.2cqw, 99px);
+}
+
+.sponsorChipLogoAiGrants {
+  width: 92%;
+}
+
 .frontFooter {
   display: flex;
   align-items: baseline;
@@ -753,6 +761,10 @@
   .sponsorChip {
     width: clamp(23px, 7.7cqw, 85px);
     height: clamp(8px, 2.6cqw, 27px);
+  }
+
+  .sponsorChipAiGrants {
+    width: clamp(29px, 9.2cqw, 99px);
   }
 
   .frontFooter {
