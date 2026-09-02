@@ -1,8 +1,6 @@
-// Client-only capture pipeline for the share/download PNG. The card is
-// captured from the LIVE, on-screen stage (so the PNG shows exactly what the
-// user sees — current shader frame, light and foil included) and composited
-// over a backdrop (base color + waves + overlay) drawn straight onto the
-// export canvas — no hidden DOM capture needed.
+// Client-only capture pipeline for the share/download PNG. A clone of the
+// live stage is captured offscreen so export sizing never reflows the visible
+// mobile page. Its current canvas frame is retained for the exported card.
 
 export const EXPORT_WIDTH = 1600;
 export const EXPORT_HEIGHT = 900;
@@ -66,33 +64,60 @@ async function snapshot(
   return blob;
 }
 
-// Captures can overlap (auto-copy on mount vs. a user click). The pin flag is
-// reference-counted so the first capture to finish cannot un-pin the stage
-// while another capture is still cloning it — that race used to produce PNGs
-// of the mirrored back face.
-let captureDepth = 0;
+function copyCanvasFrames(source: HTMLElement, target: HTMLElement) {
+  const sourceCanvases = Array.from(source.querySelectorAll("canvas"));
+  const targetCanvases = Array.from(target.querySelectorAll("canvas"));
+
+  sourceCanvases.forEach((sourceCanvas, index) => {
+    const targetCanvas = targetCanvases[index];
+    if (!targetCanvas) return;
+
+    targetCanvas.width = sourceCanvas.width;
+    targetCanvas.height = sourceCanvas.height;
+    try {
+      targetCanvas.getContext("2d")?.drawImage(sourceCanvas, 0, 0);
+    } catch {
+      // Keep the cloned canvas transparent if its source cannot be read.
+    }
+  });
+}
+
+/** Creates a connected export clone without resizing the visible stage. */
+export function createCaptureTarget(stage: HTMLElement): HTMLElement {
+  const captureTarget = stage.cloneNode(true) as HTMLElement;
+  captureTarget.dataset.capturing = "true";
+  captureTarget.setAttribute("aria-hidden", "true");
+  Object.assign(captureTarget.style, {
+    position: "fixed",
+    top: "0",
+    left: "-10000px",
+    pointerEvents: "none",
+  });
+  stage.ownerDocument.body.appendChild(captureTarget);
+  copyCanvasFrames(stage, captureTarget);
+  return captureTarget;
+}
 
 /**
- * Captures the live card as it currently appears. The `data-capturing` CSS
- * pins the stage flat on its front face with `!important` transforms while
- * the snapshot runs, so no animation state has to be reset or restored.
+ * Captures an offscreen clone. Capture-only desktop styles never touch the
+ * visible mobile stage, while the exported card keeps its desktop geometry.
  */
 export async function captureLiveCard(
   stage: HTMLElement,
 ): Promise<Blob | null> {
   await document.fonts.ready;
   await waitForImages(stage);
-  stage.dataset.capturing = "true";
-  captureDepth += 1;
+  const captureTarget = createCaptureTarget(stage);
   try {
-    // Let the pinning styles apply before cloning.
+    await waitForImages(captureTarget);
+    // Let the connected clone resolve its desktop capture styles.
     await new Promise((resolve) => requestAnimationFrame(resolve));
-    return await snapshot(stage, {
-      pixelRatio: CARD_TARGET_WIDTH / Math.max(1, stage.offsetWidth),
+    return await snapshot(captureTarget, {
+      pixelRatio:
+        CARD_TARGET_WIDTH / Math.max(1, captureTarget.offsetWidth),
     });
   } finally {
-    captureDepth -= 1;
-    if (captureDepth === 0) delete stage.dataset.capturing;
+    captureTarget.remove();
   }
 }
 

@@ -1,12 +1,56 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { downloadBlob } from "../src/lib/pass-export.ts";
+import * as passExport from "../src/lib/pass-export.ts";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const { downloadBlob } = passExport;
+
+test("capture preparation does not resize the visible mobile stage", () => {
+  const appended = [];
+  const attributes = {};
+  const clone = {
+    dataset: {},
+    style: {},
+    setAttribute(name, value) {
+      attributes[name] = value;
+    },
+    querySelectorAll() {
+      return [];
+    },
+  };
+  const stage = {
+    dataset: {},
+    cloneNode() {
+      return clone;
+    },
+    querySelectorAll() {
+      return [];
+    },
+    ownerDocument: {
+      body: {
+        appendChild(node) {
+          appended.push(node);
+        },
+      },
+    },
+  };
+
+  const createCaptureTarget = passExport.createCaptureTarget;
+  assert.equal(typeof createCaptureTarget, "function");
+  const captureTarget = createCaptureTarget(stage);
+
+  assert.equal(captureTarget, clone);
+  assert.equal(stage.dataset.capturing, undefined);
+  assert.equal(clone.dataset.capturing, "true");
+  assert.equal(clone.style.position, "fixed");
+  assert.equal(clone.style.left, "-10000px");
+  assert.equal(attributes["aria-hidden"], "true");
+  assert.deepEqual(appended, [clone]);
+});
 
 test("downloaded passes use the Syndicate event name", () => {
   let clicked = false;
