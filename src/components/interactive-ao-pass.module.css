@@ -685,9 +685,9 @@
    proportion rather than bursting out of the card. */
 @media (max-width: 620px) {
   .stage {
-    /* Matches the page's 22px side padding, so the card never runs past the
-       viewport edge the way `94vw` did. */
-    width: min(520px, calc(100vw - 44px));
+    /* Give the live phone preview comfortable gutters while preserving the
+       ticket's desktop aspect ratio. Export capture overrides this to 860px. */
+    width: min(430px, calc(100vw - 72px));
   }
 
   .frontCopy {

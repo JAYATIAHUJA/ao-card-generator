@@ -61,6 +61,7 @@ test("mobile preview keeps the desktop pass geometry", () => {
     css.indexOf("@media (prefers-reduced-motion", mobileStart),
   );
 
+  assert.match(mobileCss, /\.stage\s*\{[\s\S]*?width:\s*min\(430px,\s*calc\(100vw - 72px\)\)/);
   assert.match(mobileCss, /\.frontCopy\s*\{[\s\S]*?padding-left:\s*6\.2%/);
   assert.match(mobileCss, /\.photoFrame\s*\{[\s\S]*?width:\s*23cqw/);
   assert.match(mobileCss, /margin-left:\s*calc\(23cqw \+ 3\.2cqw\)/);
