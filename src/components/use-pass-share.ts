@@ -156,7 +156,7 @@ export function usePassShare({
 
       const message = [
         `I'm attending Syndicate, @aoagents' online hackathon.`,
-        `Cash prizes are up for grabs, powered by @maximor_ai and supported by @dodopayments, @neatlogs, and @Tensormux.`,
+        `Cash prizes are up for grabs, powered by @maximor_ai and supported by @dodopayments, @neatlogs, @Tensormux, and @aigrantsindia.`,
         `See you there! https://aoagents.dev/hackathons/syndicate`,
       ].join("\n\n");
 
